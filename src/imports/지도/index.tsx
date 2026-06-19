@@ -86,7 +86,9 @@ function pickBlock(inner: HTMLElement, sx: number, sy: number, containingOnly = 
   for (const p of paths) {
     const r = p.getBoundingClientRect();
     if (!r.width || !r.height) continue;
-    if (r.width > cRect.width * 0.5 || r.height > cRect.height * 0.5) continue; // 큰 바닥/배경 제외 (작은 건물 구획만)
+    // 배경/거대 바닥만 제외(면적 기준). 연건캠퍼스·상단 같은 큰 구획은 칠해지되, 지도 전체급 바닥은 제외.
+    const areaFrac = (r.width / cRect.width) * (r.height / cRect.height);
+    if (areaFrac > 0.36 || r.width > cRect.width * 0.9 || r.height > cRect.height * 0.9) continue;
     if (r.width < cRect.width * 0.03 || r.height < cRect.height * 0.03) continue; // 너무 작은 조각 제외
     if (r.right <= cRect.left || r.left >= cRect.right || r.bottom <= cRect.top || r.top >= cRect.bottom) continue; // 화면 밖
     // 실제 모양 안에 점이 있는지 정밀 판정 (bbox만으로는 부정확)
