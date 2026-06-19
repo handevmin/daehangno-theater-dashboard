@@ -294,7 +294,11 @@ export async function buildDashboard() {
 
   // 1) 대학로 연극 풀 → TOP 10 + 곧 시작할 회차 (한 번의 풀에서 파생)
   const pool = await getDaehakroPool(fmt(stdate), fmt(eddate), 40)
-  const top = pool.slice(0, 10)
+  // TOP10: 회차 시간대를 "다음 공연일의 그날 시간"으로 채운다 (한 주 평탄화 → 요일 섞임 방지)
+  const top = pool.slice(0, 10).map((p) => {
+    const ns = nextShow(p)
+    return ns ? { ...p, timeRange: ns.range, dayLabel: ns.dayLabel, times: ns.dayTimes?.length ? ns.dayTimes : p.times } : p
+  })
 
   // 곧 시작할 회차 후보(전체, 시각순) — 위치는 프론트의 공연장 좌표 테이블로 매칭/필터한다
   // (KOPIS 좌표는 부정확해서 사용하지 않음)
