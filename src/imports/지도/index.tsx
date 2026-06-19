@@ -132,20 +132,20 @@ function AllVenueDots() {
   );
 }
 
-// synth:true 공연장(흰 배경 자리)에 핀 아래로 그려주는 블록 — 계절색.
+// synth:true 공연장 자리를 채우는 계절색 — 도로/구획 레이어 뒤에 깔려, 흰 도로가 위에 덮이며
+// 도로로 둘러싸인 "칸" 모양대로 채워진다(선따라 채움). 넉넉히 크게 그려 도로/구획이 경계로 잘라낸다.
 function SynthBlock({ pos }: { pos: { x: number; y: number } }) {
   return (
     <div
-      className="absolute rounded-[7px] border-2 border-[#121212] pointer-events-none"
+      className="absolute pointer-events-none"
       style={{
         left: pos.x,
         top: pos.y,
-        width: 56,
-        height: 40,
+        width: 120,
+        height: 100,
         transform: "translate(-50%, -50%)",
         background: "var(--accent)",
         transition: MARKER_GLIDE,
-        zIndex: 15,
       }}
     />
   );
@@ -512,7 +512,6 @@ function EditOverlay({
   // 드래그(선택)한 핀 — 그 아래 블록색 + 레이블 미리보기 대상
   const [activeName, setActiveName] = useState<string | null>(null);
   const editColoredRef = useRef<{ el: Element; fill: string | null } | null>(null);
-  const [editSynth, setEditSynth] = useState(false); // synth:true 공연장이 블록 밖이면 합성 블록 미리보기
   const todoCount = Object.values(pos).filter((p) => p.todo).length;
   const [msg, setMsg] = useState(
     todoCount
@@ -583,9 +582,6 @@ function EditOverlay({
     if (blk) {
       editColoredRef.current = { el: blk, fill: blk.getAttribute("fill") };
       blk.setAttribute("fill", ACCENT);
-      setEditSynth(false);
-    } else {
-      setEditSynth(!!ap.synth); // synth:true 면 블록 밖이라도 합성 블록 표시
     }
     return () => {
       if (editColoredRef.current) {
@@ -680,8 +676,6 @@ function EditOverlay({
           const ly = p.ly ?? -47;
           return (
             <>
-              {/* synth:true 공연장이 블록 밖이면 핀 아래 합성 블록 */}
-              {editSynth && <SynthBlock pos={p} />}
               {/* 핀(teardrop) — 드래그 = 위치 */}
               <div
                 onPointerDown={(e) => {
@@ -828,6 +822,8 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
             <path d={svgPaths.p2c134780} fill="var(--fill-0, white)" id="Background" />
           </svg>
         </div>
+        {/* synth 공연장: 배경 위·구획/도로 아래에 깔아 도로로 둘러싸인 칸 모양대로 채움 */}
+        {synthOn && pinPos && <SynthBlock pos={pinPos} />}
         <Map />
         <Road />
         <p className="[word-break:break-word] absolute font-['Gmarket_Sans:Medium',sans-serif] inset-[19.89%_82.86%_77.46%_4.29%] leading-[normal] not-italic text-[14px] text-black text-center whitespace-nowrap">동성 중고등학교</p>
@@ -842,10 +838,7 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
         ) : showAllPins ? (
           <AllVenueDots />
         ) : (
-          <>
-            {synthOn && pinPos && <SynthBlock pos={pinPos} />}
-            <MarkerPin item={marker} pos={pinPos} />
-          </>
+          <MarkerPin item={marker} pos={pinPos} />
         )}
       </div>
       <div aria-hidden className="absolute border-3 border-[#121212] border-solid inset-[-3px] pointer-events-none" />
