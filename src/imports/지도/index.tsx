@@ -141,8 +141,8 @@ function SynthBlock({ pos }: { pos: { x: number; y: number } }) {
       style={{
         left: pos.x,
         top: pos.y,
-        width: 120,
-        height: 100,
+        width: 62,
+        height: 54,
         transform: "translate(-50%, -50%)",
         background: "var(--accent)",
         transition: MARKER_GLIDE,
