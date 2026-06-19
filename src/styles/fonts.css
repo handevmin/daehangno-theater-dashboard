@@ -1,0 +1,103 @@
+/*
+ * 디자인(Figma export)이 참조하는 폰트를 실제 웹폰트로 로드.
+ * 디자인은 font-['SUIT:Bold'] 처럼 "폰트명:굵기" 형태를 font-family 로 쓰므로
+ * @font-face 의 font-family 를 그 이름과 정확히 일치시킨다.
+ * 각 face 의 font-weight 디스크립터를 실제 파일 굵기와 맞춰 합성(faux-bold) 왜곡 방지.
+ *
+ * 출처(무료/상업적 이용 가능):
+ *  - SUIT            : github.com/sunn-us/SUIT (OFL)
+ *  - Gmarket Sans    : 지마켓 (무료 배포)
+ *  - Elice DX Neolli / Elice Digital Baeum : Elice, Inc. (OFL)
+ */
+
+/* ── 타이틀: Elice DX Neolli ───────────────────────────── */
+@font-face {
+  font-family: "Elice DX Neolli OTF:Medium";
+  src: url("https://cdn.jsdelivr.net/gh/fonts-archive/EliceDXNeolli/EliceDXNeolli-Medium.woff2")
+    format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Elice Digital Baeum ───────────────────────────────── */
+@font-face {
+  font-family: "Elice DigitalBaeum OTF:Bold";
+  src: url("https://cdn.jsdelivr.net/gh/fonts-archive/EliceDigitalBaeum/EliceDigitalBaeum-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── 연극 제목: Gmarket Sans ───────────────────────────── */
+@font-face {
+  font-family: "Gmarket Sans:Medium";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff")
+    format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── 본문 및 설명: SUIT (전 굵기) ──────────────────────── */
+@font-face {
+  font-family: "SUIT:Medium";
+  src: url("https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT-Medium.woff2")
+    format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SUIT:SemiBold";
+  src: url("https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT-SemiBold.woff2")
+    format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SUIT:Bold";
+  src: url("https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SUIT:ExtraBold";
+  src: url("https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT-ExtraBold.woff2")
+    format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SUIT:Heavy";
+  src: url("https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT-Heavy.woff2")
+    format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * 위 face 들과 동일 굵기를 요청하도록 매핑.
+ * (폰트명에 인코딩된 굵기를 element font-weight 로도 명시 → face 와 정확히 매칭)
+ */
+[class*=":Medium'"] {
+  font-weight: 500;
+}
+[class*=":SemiBold'"] {
+  font-weight: 600;
+}
+[class*=":Bold'"] {
+  font-weight: 700;
+}
+[class*=":ExtraBold'"] {
+  font-weight: 800;
+}
+[class*=":Heavy'"] {
+  font-weight: 900;
+}
