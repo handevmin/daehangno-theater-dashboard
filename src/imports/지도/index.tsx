@@ -772,7 +772,8 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
     if (!cRect.width || !cRect.height) return;
     const sx = cRect.left + (pos.x / 770) * cRect.width;
     const sy = cRect.top + (pos.y / 528) * cRect.height;
-    const chosen = pickBlock(inner, sx, sy);
+    // 핀이 실제 블록 위에 있을 때만 칠함(편집모드와 동일) — 블록 밖이면 어긋난 블록 대신 칠하지 않음
+    const chosen = pickBlock(inner, sx, sy, true);
     if (chosen) {
       coloredRef.current = { el: chosen, fill: chosen.getAttribute("fill") };
       chosen.setAttribute("fill", ACCENT);
