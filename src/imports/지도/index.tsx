@@ -86,9 +86,8 @@ function pickBlock(inner: HTMLElement, sx: number, sy: number, containingOnly = 
   for (const p of paths) {
     const r = p.getBoundingClientRect();
     if (!r.width || !r.height) continue;
-    // 배경/거대 바닥만 제외(면적 기준). 연건캠퍼스·상단 같은 큰 구획은 칠해지되, 지도 전체급 바닥은 제외.
-    const areaFrac = (r.width / cRect.width) * (r.height / cRect.height);
-    if (areaFrac > 0.36 || r.width > cRect.width * 0.9 || r.height > cRect.height * 0.9) continue;
+    // 흰 배경/지도 전체급만 제외(한 변 90% 초과). 동성중고 좌우 같은 큰 구획도 칠해지게 함.
+    if (r.width > cRect.width * 0.9 || r.height > cRect.height * 0.9) continue;
     if (r.width < cRect.width * 0.03 || r.height < cRect.height * 0.03) continue; // 너무 작은 조각 제외
     if (r.right <= cRect.left || r.left >= cRect.right || r.bottom <= cRect.top || r.top >= cRect.bottom) continue; // 화면 밖
     // 실제 모양 안에 점이 있는지 정밀 판정 (bbox만으로는 부정확)
@@ -129,25 +128,6 @@ function AllVenueDots() {
         </div>
       ))}
     </div>
-  );
-}
-
-// 실제 지도 블록이 없는 자리(빈 배경/큰 영역)에 핀 아래로 그려주는 합성 블록 — 계절색.
-function SynthBlock({ pos }: { pos: { x: number; y: number } }) {
-  return (
-    <div
-      className="absolute rounded-[7px] border-2 border-[#121212] pointer-events-none"
-      style={{
-        left: pos.x,
-        top: pos.y,
-        width: 56,
-        height: 40,
-        transform: "translate(-50%, -50%)",
-        background: "var(--accent)",
-        transition: MARKER_GLIDE,
-        zIndex: 15,
-      }}
-    />
   );
 }
 
@@ -512,7 +492,6 @@ function EditOverlay({
   // 드래그(선택)한 핀 — 그 아래 블록색 + 레이블 미리보기 대상
   const [activeName, setActiveName] = useState<string | null>(null);
   const editColoredRef = useRef<{ el: Element; fill: string | null } | null>(null);
-  const [editSynth, setEditSynth] = useState(false); // 실제 블록 없으면 합성 블록 미리보기
   const todoCount = Object.values(pos).filter((p) => p.todo).length;
   const [msg, setMsg] = useState(
     todoCount
@@ -583,9 +562,6 @@ function EditOverlay({
     if (blk) {
       editColoredRef.current = { el: blk, fill: blk.getAttribute("fill") };
       blk.setAttribute("fill", ACCENT);
-      setEditSynth(false);
-    } else {
-      setEditSynth(true); // 실제 블록 없으면 핀 아래 합성 블록 표시
     }
     return () => {
       if (editColoredRef.current) {
@@ -680,8 +656,6 @@ function EditOverlay({
           const ly = p.ly ?? -47;
           return (
             <>
-              {/* 실제 블록 없으면 핀 아래 합성 블록 미리보기 */}
-              {editSynth && <SynthBlock pos={p} />}
               {/* 핀(teardrop) — 드래그 = 위치 */}
               <div
                 onPointerDown={(e) => {
@@ -758,7 +732,6 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
   const innerRef = useRef<HTMLDivElement>(null);
   const coloredRef = useRef<{ el: Element; fill: string | null } | null>(null);
   const [pinPos, setPinPos] = useState<{ x: number; y: number } | null>(null);
-  const [synthOn, setSynthOn] = useState(false); // 실제 블록 없으면 핀 아래 합성 블록 표시
   const pos = markerPos(marker);
   let showAllPins = false;
   let showEdit = false;
@@ -790,26 +763,21 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
     if (showEdit) {
       // 편집모드에선 라이브 강조를 끄고, EditOverlay가 드래그 핀 아래만 칠한다.
       setPinPos(null);
-      setSynthOn(false);
       return;
     }
     if (!inner || !pos) {
       setPinPos(pos ?? null);
-      setSynthOn(false);
       return;
     }
     const cRect = inner.getBoundingClientRect();
     if (!cRect.width || !cRect.height) return;
     const sx = cRect.left + (pos.x / 770) * cRect.width;
     const sy = cRect.top + (pos.y / 528) * cRect.height;
-    // 핀이 실제 블록 위면 그 블록을 칠하고, 아니면(빈 자리/큰 영역) 핀 아래 합성 블록을 그린다.
+    // 핀이 실제 블록 위면 그 블록을 칠함 (블록 밖이면 칠하지 않음)
     const chosen = pickBlock(inner, sx, sy, true);
     if (chosen) {
       coloredRef.current = { el: chosen, fill: chosen.getAttribute("fill") };
       chosen.setAttribute("fill", ACCENT);
-      setSynthOn(false);
-    } else {
-      setSynthOn(true);
     }
     setPinPos(pos); // 핀은 항상 저장 위치 (블록 중심으로 점프하지 않음)
     return () => {
@@ -842,10 +810,7 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
         ) : showAllPins ? (
           <AllVenueDots />
         ) : (
-          <>
-            {synthOn && pinPos && <SynthBlock pos={pinPos} />}
-            <MarkerPin item={marker} pos={pinPos} />
-          </>
+          <MarkerPin item={marker} pos={pinPos} />
         )}
       </div>
       <div aria-hidden className="absolute border-3 border-[#121212] border-solid inset-[-3px] pointer-events-none" />
