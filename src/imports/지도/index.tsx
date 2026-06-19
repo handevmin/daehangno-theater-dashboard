@@ -17,8 +17,8 @@ const shortVenue = (v: string) => (v ? v.replace(/\s*\(.*$/, "").trim() || v : "
 import venuePositionsRaw from "./venuePositions.json";
 // todo:true = 내가(어시스턴트) 추측으로 자동 추가한 위치 → 편집모드에서 파란색(검토필요)으로 표시
 // lx/ly = 이름표(레이블) 중심의 핀 대비 오프셋(770좌표). 없으면 핀 위 기본 위치.
-// synth:true = 실제 지도 블록이 없는(흰 배경) 자리라도 핀 아래에 블록을 직접 그려 칠함.
-type VenueEntry = { x: number; y: number; todo?: boolean; lx?: number; ly?: number; synth?: boolean };
+// synth:true = 실제 지도 블록이 없는(흰 배경) 자리라도 칠함. poly = 그 칸의 외곽선(770좌표) → 도로 선을 따라 칸 모양대로 칠함.
+type VenueEntry = { x: number; y: number; todo?: boolean; lx?: number; ly?: number; synth?: boolean; poly?: number[][] };
 const VENUE_POS: Record<string, VenueEntry> = venuePositionsRaw as Record<string, VenueEntry>;
 const VENUE_POS_ENTRIES = Object.entries(VENUE_POS).map(([k, v]) => [k.replace(/\s+/g, ""), v] as const);
 
@@ -132,9 +132,24 @@ function AllVenueDots() {
   );
 }
 
-// synth:true 공연장 자리를 채우는 계절색 — 도로/구획 레이어 뒤에 깔려, 흰 도로가 위에 덮이며
-// 도로로 둘러싸인 "칸" 모양대로 채워진다(선따라 채움). 넉넉히 크게 그려 도로/구획이 경계로 잘라낸다.
-function SynthBlock({ pos }: { pos: { x: number; y: number } }) {
+// synth:true 공연장 자리를 채우는 계절색 — 도로/구획 레이어 뒤에 깔린다.
+// poly(칸 외곽선)가 있으면 그 다각형을 칠해 도로 선을 따라 칸 모양대로 정확히 채운다(선따라 채움).
+// poly가 없으면 핀 아래 사각형을 깔고 흰 도로가 위에 덮여 대략적인 칸 모양으로 잘린다.
+function SynthBlock({ pos, poly }: { pos: { x: number; y: number }; poly?: number[][] }) {
+  if (poly && poly.length >= 3) {
+    const points = poly.map(([x, y]) => `${x},${y}`).join(" ");
+    return (
+      <svg
+        className="absolute inset-0 size-full pointer-events-none"
+        fill="none"
+        preserveAspectRatio="none"
+        viewBox="0 0 770 528"
+        style={{ transition: MARKER_GLIDE }}
+      >
+        <polygon points={points} fill="var(--accent)" />
+      </svg>
+    );
+  }
   return (
     <div
       className="absolute pointer-events-none"
@@ -823,7 +838,7 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
           </svg>
         </div>
         {/* synth 공연장: 배경 위·구획/도로 아래에 깔아 도로로 둘러싸인 칸 모양대로 채움 */}
-        {synthOn && pinPos && <SynthBlock pos={pinPos} />}
+        {synthOn && pinPos && <SynthBlock pos={pinPos} poly={venueEntry(marker?.venue)?.poly} />}
         <Map />
         <Road />
         <p className="[word-break:break-word] absolute font-['Gmarket_Sans:Medium',sans-serif] inset-[19.89%_82.86%_77.46%_4.29%] leading-[normal] not-italic text-[14px] text-black text-center whitespace-nowrap">동성 중고등학교</p>
