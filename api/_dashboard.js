@@ -139,10 +139,11 @@ function nextShow(item) {
   const end = ymdToMs(item.periodTo)
   const sched = parseSchedule(item.showGuidance)
   const runtime = parseRuntime(item.runtime)
-  for (let off = 0; off <= 10; off++) {
+  // 개막 전 공연도 첫 공연일을 찾도록 시작일(미래면 그 날)부터 공연 종료일까지 탐색 (안전상 최대 400일)
+  const from = start !== null ? Math.max(today0, start) : today0
+  for (let off = (from - today0) / 86400000; off <= (from - today0) / 86400000 + 400; off++) {
     const dayMs = today0 + off * 86400000
     if (end !== null && dayMs > end) break
-    if (start !== null && dayMs < start) continue
     const wd = new Date(dayMs).getUTCDay()
     const times = sched ? sched[wd] || [] : item.times
     // 그날의 "아직 안 지난" 회차들 (요일별 스케줄 기준) — 화면엔 이 그날 시간대만 보여준다
