@@ -574,7 +574,8 @@ function EditOverlay({
     setMsg("저장 중…");
     const json = JSON.stringify(pos, null, 2);
     try {
-      const res = await fetch("/api/save-venues", {
+      const key = new URLSearchParams(window.location.search).get("key") || "";
+      const res = await fetch("/api/save-venues" + (key ? `?key=${encodeURIComponent(key)}` : ""), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: json,

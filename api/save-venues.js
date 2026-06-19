@@ -19,6 +19,20 @@ export default async function handler(req, res) {
     res.statusCode = 405
     return res.end(JSON.stringify({ ok: false, error: 'POST only' }))
   }
+  // 공개 엔드포인트 보호: EDIT_KEY 가 설정돼 있으면 ?key= 일치해야 저장 허용
+  const editKey = process.env.EDIT_KEY
+  if (editKey) {
+    let key = ''
+    try {
+      key = new URL(req.url, 'http://x').searchParams.get('key') || ''
+    } catch {
+      key = ''
+    }
+    if (key !== editKey) {
+      res.statusCode = 401
+      return res.end(JSON.stringify({ ok: false, error: '편집 키 필요 (?edit=1&key=…)' }))
+    }
+  }
   const token = process.env.GITHUB_TOKEN
   const repo = process.env.GITHUB_REPO
   const branch = process.env.GITHUB_BRANCH || 'main'
