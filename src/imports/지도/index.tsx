@@ -616,26 +616,28 @@ function EditOverlay({
         headers: { "Content-Type": "application/json" },
         body: json,
       });
-      let saved = false;
-      let note = "venuePositions.json 반영됨";
+      let j: { ok?: boolean; committed?: boolean; note?: string; error?: string } | null = null;
       try {
-        const j = await res.clone().json();
-        saved = res.ok && !!j?.ok;
-        if (j?.note) note = j.note;
-        else if (j?.committed) note = "GitHub 커밋됨 → 약 1분 뒤 반영";
+        j = await res.clone().json();
       } catch {
-        saved = false;
+        j = null;
       }
-      if (saved) {
-        setMsg("저장됨 ✓ " + note);
+      if (res.ok && j?.ok) {
+        setMsg("저장됨 ✓ " + (j.note || (j.committed ? "GitHub 커밋됨 → 약 1분 뒤 반영" : "반영됨")));
         return;
       }
-      // 저장 엔드포인트 없음(프로덕션 등) → JSON 클립보드 복사로 대체
+      // 실패 — 원인을 그대로 보여준다 (404/네트워크일 때만 클립보드 대체)
       navigator.clipboard?.writeText(json);
-      setMsg("이 환경(프로덕션)은 파일 저장 불가 → JSON을 클립보드에 복사했어요. venuePositions.json에 붙여넣으세요. (또는 개발서버에서 저장)");
+      if (res.status === 401) {
+        setMsg("저장 실패(401): 편집 키가 없거나 틀립니다 — 주소에 ?edit=1&key=◯◯◯ 형태로 키를 붙여 접속하세요. (JSON은 클립보드 복사됨)");
+      } else if (res.status === 404) {
+        setMsg("저장 실패: 저장 API가 없는 환경입니다 → JSON을 클립보드에 복사했어요. venuePositions.json에 붙여넣으세요.");
+      } else {
+        setMsg(`저장 실패(${res.status}): ${j?.error || "서버 오류"} → JSON 클립보드 복사됨. (Vercel 환경변수 GITHUB_TOKEN/GITHUB_REPO 확인)`);
+      }
     } catch {
       navigator.clipboard?.writeText(json);
-      setMsg("파일 저장 불가(개발서버 전용) → JSON 클립보드 복사됨. venuePositions.json에 붙여넣으세요.");
+      setMsg("저장 실패: 네트워크 오류 → JSON 클립보드 복사됨. venuePositions.json에 붙여넣으세요.");
     }
   };
   const copy = () => {
