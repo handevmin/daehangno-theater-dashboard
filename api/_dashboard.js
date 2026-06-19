@@ -145,16 +145,20 @@ function nextShow(item) {
     if (start !== null && dayMs < start) continue
     const wd = new Date(dayMs).getUTCDay()
     const times = sched ? sched[wd] || [] : item.times
-    for (const t of [...times].sort()) {
+    // 그날의 "아직 안 지난" 회차들 (요일별 스케줄 기준) — 화면엔 이 그날 시간대만 보여준다
+    const dayTimes = [...times].sort().filter((t) => {
+      const [hh, mi] = t.split(':').map(Number)
+      return dayMs + (hh * 60 + mi) * 60000 >= now
+    })
+    if (dayTimes.length) {
+      const t = dayTimes[0]
       const [hh, mi] = t.split(':').map(Number)
       const startMs = dayMs + (hh * 60 + mi) * 60000
-      if (startMs >= now) {
-        const range = runtime ? `${t}-${minToHHMM(hh * 60 + mi + runtime)}` : t
-        const dd = new Date(dayMs)
-        const dayLabel =
-          off === 0 ? '오늘' : off === 1 ? '내일' : `${dd.getUTCMonth() + 1}.${dd.getUTCDate()}(${WD_KO[wd]})`
-        return { range, dayLabel, sortKey: startMs }
-      }
+      const range = runtime ? `${t}-${minToHHMM(hh * 60 + mi + runtime)}` : t
+      const dd = new Date(dayMs)
+      const dayLabel =
+        off === 0 ? '오늘' : off === 1 ? '내일' : `${dd.getUTCMonth() + 1}.${dd.getUTCDate()}(${WD_KO[wd]})`
+      return { range, dayLabel, sortKey: startMs, dayTimes }
     }
   }
   return null
@@ -268,7 +272,8 @@ function buildSoonShows(pool) {
   const items = []
   for (const p of pool) {
     const ns = nextShow(p)
-    if (ns) items.push({ ...p, timeRange: ns.range, dayLabel: ns.dayLabel, _sort: ns.sortKey })
+    // times: 한 주 평탄화 목록 대신 "다음 공연일의 그날 시간대"로 교체 (요일 섞임 방지)
+    if (ns) items.push({ ...p, timeRange: ns.range, dayLabel: ns.dayLabel, times: ns.dayTimes?.length ? ns.dayTimes : p.times, _sort: ns.sortKey })
   }
   items.sort((a, b) => a._sort - b._sort)
   return items.map(({ _sort, ...r }) => r)

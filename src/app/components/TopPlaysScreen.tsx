@@ -196,7 +196,10 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
           </div>
           <div className="content-stretch flex flex-col gap-[16px] items-start p-[15px] relative shrink-0 w-full">
             {times.length > 0 && (
-              <div className="content-stretch flex gap-[6px] items-center relative shrink-0">
+              <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
+                {item.dayLabel && (
+                  <p className="font-['SUIT:Bold',sans-serif] text-[#121212] text-[13px] whitespace-nowrap">{item.dayLabel}</p>
+                )}
                 {times.map((t) => (
                   <div key={t} className="bg-white content-stretch flex flex-col gap-[2px] items-center justify-center px-[10px] py-[6px] relative rounded-[4px] shrink-0 w-[80px]">
                     <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[4px]" />

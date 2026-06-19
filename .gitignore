@@ -10,3 +10,5 @@ screenshots/
 그림1.png
 *.pdf
 _enum.txt
+
+.env*
