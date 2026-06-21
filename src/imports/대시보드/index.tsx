@@ -144,21 +144,21 @@ function Weekly({ data }: { data: DashboardData }) {
   );
 }
 
-// 요일별 예매 막대그래프
+// 요일별 공연 회차 막대그래프 (대학로 스케줄 기반 — 실제 상연 패턴)
 function DayOfWeekChart({ data }: { data: DashboardData }) {
-  const days = data.dayOfWeek;
-  const max = Math.max(1, ...days.map((d) => d.seats));
+  const days = data.dayShowings;
+  const max = Math.max(1, ...days.map((d) => d.count));
   // 축 눈금 (4단계)
-  const step = Math.ceil(max / 4 / 100) * 100;
+  const step = Math.max(1, Math.ceil(max / 4));
   const axis = [4, 3, 2, 1].map((i) => i * step);
   const chartH = 160; // 막대 영역 높이
   const baseTop = 36;
-  const todayIdx = days.length - 1;
+  const peakIdx = days.reduce((bi, d, i, a) => (d.count > a[bi].count ? i : bi), 0); // 최다 상연일 강조
   return (
     <>
     <div className="absolute border-2 border-[#121212] border-solid h-[194px] left-[866px] overflow-clip top-[133px] w-[531px]" data-name="Box">
       <div className="absolute bg-[#121212] h-[194px] left-[-2px] overflow-clip top-[-2px] w-[208px]" data-name="Title">
-        <p className="[word-break:break-word] absolute font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[normal] left-[12px] not-italic text-[26px] text-white top-[12px] whitespace-nowrap">요일별 예매</p>
+        <p className="[word-break:break-word] absolute font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[normal] left-[12px] not-italic text-[26px] text-white top-[12px] whitespace-nowrap">요일별 공연 회차</p>
         <div className="absolute content-stretch flex flex-col gap-[28px] items-end justify-center right-0 top-[21px]" data-name="Wrap">
           {axis.map((v) => (
             <div key={v} className="content-stretch flex gap-[4px] items-center relative shrink-0">
@@ -170,8 +170,8 @@ function DayOfWeekChart({ data }: { data: DashboardData }) {
       </div>
       <div className="absolute h-[194px] left-[206px] overflow-clip top-[-2px] w-[323px]" data-name="Chart">
         {days.map((d, i) => {
-          const h = Math.max(4, (d.seats / (step * 4)) * chartH);
-          const isToday = i === todayIdx;
+          const h = Math.max(4, (d.count / (step * 4)) * chartH);
+          const isToday = i === peakIdx;
           return (
             <div
               key={d.date}

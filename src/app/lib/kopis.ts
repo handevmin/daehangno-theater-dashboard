@@ -51,6 +51,13 @@ export interface DayPoint {
   seats: number
 }
 
+export interface ShowingPoint {
+  day: string
+  dayKo: string
+  date: string
+  count: number
+}
+
 export interface DashboardData {
   week: { label: string; stdate: string; eddate: string }
   top: PlayItem[]
@@ -61,6 +68,7 @@ export interface DashboardData {
   weekDeltaPct: number
   weeklyTrend: TrendPoint[]
   dayOfWeek: DayPoint[]
+  dayShowings: ShowingPoint[]
   generatedAt: string
 }
 

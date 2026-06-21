@@ -188,6 +188,20 @@ function todayShow(item) {
   const range = runtime ? `${base}-${minToHHMM(h * 60 + m + runtime)}` : base
   return { times, range, dayLabel: '오늘' }
 }
+// 특정 날짜(dayMs, 요일 wd)에 대학로 풀에서 상연되는 "회차 수" 합 (스케줄 기반, 공연 공급량)
+function showingsOnDate(pool, dayMs, wd) {
+  let n = 0
+  for (const p of pool) {
+    const s = ymdToMs(p.periodFrom)
+    const e = ymdToMs(p.periodTo)
+    if (s !== null && dayMs < s) continue // 개막 전
+    if (e !== null && dayMs > e) continue // 종연 후
+    const sched = parseSchedule(p.showGuidance)
+    if (!sched) continue // 스케줄 파싱 불가는 제외
+    n += (sched[wd] || []).length
+  }
+  return n
+}
 
 // ----- 상세조회 → 통합 아이템 -----
 async function fetchDetail(mt20id) {
@@ -346,6 +360,14 @@ export async function buildDashboard() {
   // 어제(마지막)가 미완이면 한 칸 당겨 7일, 정상이면 평소 7일 — 막대 개수는 항상 7개로 동일
   const dayOfWeek = isIncompleteLast(rows8) ? rows8.slice(0, 7) : rows8.slice(1, 8)
 
+  // 2-b) 요일별 공연 회차 (대학로 스케줄 기반) — 실제 상연 패턴(주말 높음). 예매일 통계와 별개.
+  const dayShowings = Array.from({ length: 7 }, (_, k) => {
+    const d = addDays(stdate, k)
+    const dayMs = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())
+    const wd = d.getDay()
+    return { day: WEEKDAYS_EN[wd], dayKo: WEEKDAYS_KO[wd], date: fmt(d), count: showingsOnDate(pool, dayMs, wd) }
+  })
+
   // 3) 주간 공스피 추이 (최근 8주, 연극 전국)
   const weekWindows = Array.from({ length: 8 }, (_, k) => {
     const ws = addDays(stdate, -7 * (7 - k))
@@ -381,6 +403,7 @@ export async function buildDashboard() {
     weekDeltaPct: Math.round(weekDeltaPct * 10) / 10,
     weeklyTrend,
     dayOfWeek,
+    dayShowings,
     generatedAt: new Date().toISOString(),
   }
 }
