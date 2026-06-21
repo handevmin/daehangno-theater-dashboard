@@ -178,16 +178,15 @@ function todayShow(item) {
   const times = [...(sched ? sched[wd] || [] : item.times || [])].sort()
   if (!times.length) return null // 오늘 요일엔 공연 없음
   const runtime = parseRuntime(item.runtime)
-  // 표시: 오늘 아직 안 지난 회차 우선, 다 지났으면 오늘 전체(작품은 계속 노출)
+  // 화면엔 "오늘 전체 시간표"를 일관되게 표시 (예매사이트 그날 회차와 동일). range는 다음(안 지난) 회차 기준.
   const upcoming = times.filter((t) => {
     const [h, m] = t.split(':').map(Number)
     return today0 + (h * 60 + m) * 60000 >= now
   })
-  const shown = upcoming.length ? upcoming : times
-  const first = shown[0]
-  const [h, m] = first.split(':').map(Number)
-  const range = runtime ? `${first}-${minToHHMM(h * 60 + m + runtime)}` : first
-  return { times: shown, range, dayLabel: '오늘' }
+  const base = upcoming[0] || times[0]
+  const [h, m] = base.split(':').map(Number)
+  const range = runtime ? `${base}-${minToHHMM(h * 60 + m + runtime)}` : base
+  return { times, range, dayLabel: '오늘' }
 }
 
 // ----- 상세조회 → 통합 아이템 -----
