@@ -164,6 +164,31 @@ function nextShow(item) {
   }
   return null
 }
+// 공연이 "오늘" 무대에 오르는지 + 오늘 회차 시간들 (오늘 공연 없으면 null)
+function todayShow(item) {
+  const now = nowKstMs()
+  const nowD = new Date(now)
+  const today0 = Date.UTC(nowD.getUTCFullYear(), nowD.getUTCMonth(), nowD.getUTCDate())
+  const start = ymdToMs(item.periodFrom)
+  const end = ymdToMs(item.periodTo)
+  if (start !== null && today0 < start) return null // 아직 개막 전
+  if (end !== null && today0 > end) return null // 이미 종연
+  const sched = parseSchedule(item.showGuidance)
+  const wd = new Date(today0).getUTCDay()
+  const times = [...(sched ? sched[wd] || [] : item.times || [])].sort()
+  if (!times.length) return null // 오늘 요일엔 공연 없음
+  const runtime = parseRuntime(item.runtime)
+  // 표시: 오늘 아직 안 지난 회차 우선, 다 지났으면 오늘 전체(작품은 계속 노출)
+  const upcoming = times.filter((t) => {
+    const [h, m] = t.split(':').map(Number)
+    return today0 + (h * 60 + m) * 60000 >= now
+  })
+  const shown = upcoming.length ? upcoming : times
+  const first = shown[0]
+  const [h, m] = first.split(':').map(Number)
+  const range = runtime ? `${first}-${minToHHMM(h * 60 + m + runtime)}` : first
+  return { times: shown, range, dayLabel: '오늘' }
+}
 
 // ----- 상세조회 → 통합 아이템 -----
 async function fetchDetail(mt20id) {
@@ -295,11 +320,14 @@ export async function buildDashboard() {
 
   // 1) 대학로 연극 풀 → TOP 10 + 곧 시작할 회차 (한 번의 풀에서 파생)
   const pool = await getDaehakroPool(fmt(stdate), fmt(eddate), 40)
-  // TOP10: 회차 시간대를 "다음 공연일의 그날 시간"으로 채운다 (한 주 평탄화 → 요일 섞임 방지)
-  const top = pool.slice(0, 10).map((p) => {
-    const ns = nextShow(p)
-    return ns ? { ...p, timeRange: ns.range, dayLabel: ns.dayLabel, times: ns.dayTimes?.length ? ns.dayTimes : p.times } : p
-  })
+  // TOP10: "오늘 실제 공연하는" 작품만 예매순위대로 추려 1~10위 재부여 (개막 전 선예매 등 제외)
+  const top = []
+  for (const p of pool) {
+    const ts = todayShow(p)
+    if (!ts) continue
+    top.push({ ...p, rank: top.length + 1, times: ts.times, timeRange: ts.range, dayLabel: ts.dayLabel })
+    if (top.length >= 10) break
+  }
 
   // 곧 시작할 회차 후보(전체, 시각순) — 위치는 프론트의 공연장 좌표 테이블로 매칭/필터한다
   // (KOPIS 좌표는 부정확해서 사용하지 않음)
