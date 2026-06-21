@@ -4,14 +4,6 @@ import { TodaySeatsBox } from "../../app/components/TodaySeatsBox";
 import { MarqueeText } from "../../app/components/MarqueeText";
 import { proxyImg, fmtNum, type DashboardData, type PlayItem } from "../../app/lib/kopis";
 
-// 연령 태그 색상 (19+ 빨강, 15+ 주황, 그 외 연두)
-function ageColor(ageNum: string): string {
-  const n = parseInt(ageNum, 10);
-  if (Number.isFinite(n) && n >= 19) return "#ff8173";
-  if (Number.isFinite(n) && n >= 15) return "#ffbf6b";
-  return "#c3ff83";
-}
-
 function Frame() {
   return (
     <div className="absolute h-[720px] left-0 top-0 w-[117px]">
@@ -132,25 +124,6 @@ function Card({ item }: { item: PlayItem }) {
           <div className="content-stretch flex items-center justify-center px-[8px] relative shrink-0" data-name="Rank">
             <p className="[word-break:break-word] font-['SUIT:Bold',sans-serif] leading-[normal] not-italic relative shrink-0 text-[16px] text-white whitespace-nowrap">{item.rank}위</p>
           </div>
-          <div className="flex h-[24px] items-center justify-center relative shrink-0 w-0">
-            <div className="flex-none rotate-90">
-              <div className="h-0 relative w-[24px]">
-                <div className="absolute inset-[-1px_0_0_0]">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 1">
-                    <line stroke="var(--stroke-0, white)" strokeOpacity="0.2" x2="24" y1="0.5" y2="0.5" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="content-stretch flex gap-[2px] items-center relative shrink-0" data-name="Wrap">
-          {item.ageNum && (
-            <div className="content-stretch flex items-center justify-center px-[10px] py-[6px] relative rounded-[999px] shrink-0 size-[30px]" data-name="Tag" style={{ backgroundColor: ageColor(item.ageNum) }}>
-              <div aria-hidden className="absolute border-2 border-[#121212] border-solid inset-0 pointer-events-none rounded-[999px]" />
-              <p className="[word-break:break-word] font-['SUIT:Bold',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#121212] text-[14px] whitespace-nowrap">{item.ageNum}</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
