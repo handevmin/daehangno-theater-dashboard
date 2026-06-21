@@ -438,7 +438,7 @@ function Exit2() {
   return (
     <div className="absolute bg-[#57f5eb] content-stretch flex flex-col inset-[51.14%_30.13%_44.12%_66.62%] items-center justify-center p-[10px] rounded-[999px]" data-name="Exit">
       <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[999px]" />
-      <p className="[word-break:break-word] translate-x-[-2px] translate-y-[0.5px] font-['Gmarket_Sans:Medium',sans-serif] leading-none not-italic relative shrink-0 text-[14px] text-black text-center w-full">3</p>
+      <p className="[word-break:break-word] translate-x-[-2px] translate-y-[2.5px] font-['Gmarket_Sans:Medium',sans-serif] leading-none not-italic relative shrink-0 text-[14px] text-black text-center w-full">3</p>
     </div>
   );
 }
