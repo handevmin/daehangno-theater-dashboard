@@ -151,9 +151,8 @@ function IconCalendar() {
 }
 
 function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fadeIn?: boolean }) {
-  const intro =
-    item.intro ||
-    `${item.cast.slice(0, 3).join(", ")}${item.cast.length ? " 출연. " : ""}${item.venue}에서 만나는 연극${item.runtime ? ` · 러닝타임 ${item.runtime}` : ""}.`;
+  // 줄거리(KOPIS sty)가 있으면 그대로, 없으면 러닝타임만 — 배우/공연장은 아래에 이미 있어 중복 제거
+  const intro = item.intro || (item.runtime ? `러닝타임 ${item.runtime}` : "");
   const reserveUrl = item.reservations[0]?.url || "";
   const times = item.times.slice(0, 2);
   return (
