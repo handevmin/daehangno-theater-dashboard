@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import MapComponent from "../../imports/지도";
 import Top5Component from "../../imports/연극15";
 import Top610Component from "../../imports/연극610";
+import SmallTop5Component from "../../imports/소극장15";
 import DashboardComponent from "../../imports/대시보드";
 import { useDashboardData } from "../hooks/useDashboardData";
 
@@ -11,13 +12,13 @@ const FADE_MS = 1000; // 크로스페이드 시간
 const DESIGN_WIDTH = 1440;
 const DESIGN_HEIGHT = 1024;
 
-// 화면 순환 순서: 지도 → Top1-5 → Top6-10 → 대시보드 → (반복)
-const SLIDES = [MapComponent, Top5Component, Top610Component, DashboardComponent];
+// 화면 순환 순서: 지도 → Top1-5 → Top6-10 → 소극장 Top1-5 → 대시보드 → (반복)
+const SLIDES = [MapComponent, Top5Component, Top610Component, SmallTop5Component, DashboardComponent];
 
 // 지도: 핀 6곳 × 2.8초 = 16.8초 (마지막 핀에서 멈춤).
-// 연극 TOP 1~5 / 6~10: 항목 5개 × 2.8초 = 14초 (마지막 항목에서 멈춤, TopPlaysScreen).
+// 연극 TOP 1~5 / 6~10 / 소극장 Top1-5: 항목 5개 × 2.8초 = 14초 (마지막 항목에서 멈춤, TopPlaysScreen).
 // 대시보드: 기본 10초.
-const SLIDE_DURATIONS = [16800, 14000, 14000, INTERVAL_MS];
+const SLIDE_DURATIONS = [16800, 14000, 14000, 14000, INTERVAL_MS];
 
 // 캡쳐/디버그용: ?slide=N 이면 해당 슬라이드 고정. ?edit=1 이면 지도(0번) 고정.
 function lockedSlide(): number | null {

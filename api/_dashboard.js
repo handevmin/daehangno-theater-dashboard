@@ -259,6 +259,7 @@ function enrich(boxof, detail, rank) {
     times: parseTimes(detail?.dtguidance),
     prfdtcnt: num(boxof.prfdtcnt),
     seatScale: num(boxof.seatcnt),
+    openrun: String(detail?.openrun ?? '').trim().toUpperCase() === 'Y', // 오픈런(상시공연, 마감기간 없음) 여부
     state: String(detail?.prfstate ?? '').trim(),
     reservations: toArr(detail?.relates?.relate)
       .map((r) => ({ name: r?.relatenm ?? '', url: r?.relateurl ?? '' }))
@@ -342,6 +343,18 @@ export async function buildDashboard() {
     if (top.length >= 10) break
   }
 
+  // 오늘의 소극장 TOP5: 300석 미만 + 연극 + 오픈런 제외 + 오늘 공연 (예매순위대로 1~5위)
+  const smallTop = []
+  for (const p of pool) {
+    if (!(p.seatScale > 0 && p.seatScale < 300)) continue // 300석 미만 (좌석 정보 없으면 제외)
+    if (p.openrun) continue // 오픈런(상시공연) 제외
+    if (p.genre && p.genre !== '연극') continue // 연극만 (뮤지컬 등 제외)
+    const ts = todayShow(p)
+    if (!ts) continue // 오늘 공연하는 것만
+    smallTop.push({ ...p, rank: smallTop.length + 1, times: ts.times, timeRange: ts.range, dayLabel: ts.dayLabel })
+    if (smallTop.length >= 5) break
+  }
+
   // 곧 시작할 회차 후보(전체, 시각순) — 위치는 프론트의 공연장 좌표 테이블로 매칭/필터한다
   // (KOPIS 좌표는 부정확해서 사용하지 않음)
   const soonAll = buildSoonShows(pool)
@@ -396,6 +409,7 @@ export async function buildDashboard() {
       eddate: fmt(eddate),
     },
     top,
+    smallTop,
     upcoming: soon.items,
     upcomingCount: soon.total,
     todaySeats,

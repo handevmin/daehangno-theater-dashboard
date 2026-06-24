@@ -237,13 +237,15 @@ export function TopPlaysScreen({
   start,
   count,
   title,
+  list,
 }: {
   data: DashboardData;
   start: number; // 0-based 시작 인덱스
   count: number;
   title: string;
+  list?: PlayItem[]; // 미지정 시 data.top 사용 (소극장 등 다른 목록 주입용)
 }) {
-  const items = data.top.slice(start, start + count);
+  const items = (list ?? data.top).slice(start, start + count);
   // 항목을 하나씩 순환 강조(2.8초 간격), 마지막 항목에서 멈춤 → 지도 핀과 동일한 방식
   const [tick, setTick] = useState(0);
   useEffect(() => {

@@ -28,6 +28,7 @@ export interface PlayItem {
   times: string[]
   prfdtcnt: number
   seatScale: number
+  openrun?: boolean
   state: string
   reservations: Reservation[]
   // "곧 시작할 회차" 전용 (upcoming 항목에만 존재)
@@ -61,6 +62,7 @@ export interface ShowingPoint {
 export interface DashboardData {
   week: { label: string; stdate: string; eddate: string }
   top: PlayItem[]
+  smallTop: PlayItem[]
   upcoming: PlayItem[]
   upcomingCount: number
   todaySeats: number
