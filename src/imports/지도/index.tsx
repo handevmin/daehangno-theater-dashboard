@@ -781,14 +781,12 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
     showAllPins = false;
   }
 
-  // 원래 노란 구획 처리: 서울연극센터(Vector_21)는 기본 강조색으로 칠하고, 나머지는 회색으로.
+  // 원래 노란 구획(서울연극센터 등)은 회색으로 → 동적 강조 블럭만 강조색으로 보이게
   useEffect(() => {
     const inner = innerRef.current;
     if (!inner) return;
     inner.querySelectorAll("path").forEach((p) => {
-      if ((p.getAttribute("fill") || "").includes("#FDF340")) {
-        p.setAttribute("fill", p.id === "Vector_21" ? ACCENT : "#EAEAEA");
-      }
+      if ((p.getAttribute("fill") || "").includes("#FDF340")) p.setAttribute("fill", "#EAEAEA");
     });
   }, []);
 
