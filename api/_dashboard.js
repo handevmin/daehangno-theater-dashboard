@@ -254,6 +254,8 @@ function enrich(boxof, detail, rank) {
       .map((s) => s.trim().replace(/\s*등$/, ''))
       .filter(Boolean),
     crew: String(detail?.prfcrew ?? '').trim(),
+    host: String(detail?.entrpsnmH ?? '').trim(), // 주최
+    organizer: String(detail?.entrpsnmA ?? '').trim(), // 주관
     intro: sty,
     showGuidance: String(detail?.dtguidance ?? '').trim(),
     times: parseTimes(detail?.dtguidance),

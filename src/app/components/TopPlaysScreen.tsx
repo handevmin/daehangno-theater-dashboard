@@ -99,35 +99,6 @@ function Row({ item, active }: { item: PlayItem; active?: boolean }) {
   );
 }
 
-function Actors({ cast }: { cast: string[] }) {
-  // 한 줄에 동그라미 7개까지 들어감. 7명 이하면 전부 표시, 8명 이상일 때만 6명 + "그 외 +N"
-  const MAX = 7;
-  const shown = cast.length <= MAX ? cast : cast.slice(0, MAX - 1);
-  const rest = cast.length - shown.length;
-  return (
-    <div className="content-stretch flex gap-[5px] items-center p-[15px] relative shrink-0 w-full">
-      {shown.map((name, i) => (
-        <div key={i} className="content-stretch flex flex-col gap-px items-center relative shrink-0 w-[32px]">
-          <div className="size-[32px] relative rounded-[888px] bg-[#e3e2e0] flex items-center justify-center overflow-hidden">
-            <span className="font-['SUIT:Bold',sans-serif] text-[13px] text-[#121212]">{name.slice(0, 1)}</span>
-            <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[888px]" />
-          </div>
-          <p className="font-['SUIT:Medium',sans-serif] text-[#121212] text-[10px] tracking-[-0.4px] whitespace-nowrap">{name.length > 4 ? name.slice(0, 3) + "…" : name}</p>
-        </div>
-      ))}
-      {rest > 0 && (
-        <div className="content-stretch flex flex-col gap-px items-center relative shrink-0 w-[32px]">
-          <div className="size-[32px] relative rounded-[888px] bg-[rgba(18,18,18,0.2)] flex items-center justify-center">
-            <span className="font-['SUIT:Bold',sans-serif] text-[12px] text-[var(--accent)]">+{rest}</span>
-            <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[888px]" />
-          </div>
-          <p className="font-['SUIT:Medium',sans-serif] text-[#121212] text-[10px] tracking-[-0.4px] whitespace-nowrap">그 외</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function IconLocation() {
   return (
     <div className="overflow-clip relative rounded-[699.3px] shrink-0 size-[24px]">
@@ -151,10 +122,15 @@ function IconCalendar() {
 }
 
 function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fadeIn?: boolean }) {
-  // 줄거리(KOPIS sty)가 있으면 그대로, 없으면 러닝타임만 — 배우/공연장은 아래에 이미 있어 중복 제거
-  const intro = item.intro || (item.runtime ? `러닝타임 ${item.runtime}` : "");
   const reserveUrl = item.reservations[0]?.url || "";
-  const times = item.times.slice(0, 2);
+  const times = item.times; // 오늘 회차 전체
+  // 출연진: 이름 목록 (최대 6명 + "외")
+  const castText = item.cast.length
+    ? item.cast.slice(0, 6).join(", ") + (item.cast.length > 6 ? " 외" : "")
+    : "";
+  const seatText = item.seatScale > 0 ? `총 ${item.seatScale}석` : "";
+  const host = (item.host || "").split(/[,，]/)[0].trim(); // 주최 (대표 1곳)
+  const organizer = (item.organizer || "").split(/[,，]/)[0].trim(); // 주관 (대표 1곳)
   return (
     <div
       className="absolute content-stretch flex flex-col items-start left-[739px] top-[158px] w-[661px]"
@@ -185,37 +161,60 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
                     </div>
                   )}
                 </div>
-                <div className="content-stretch flex flex-col gap-[5px] items-start relative shrink-0 w-full">
-                  <p className="flex-[1_0_0] font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] overflow-hidden text-[27px] text-ellipsis text-white w-full whitespace-nowrap">{cleanTitle(item.title)}</p>
-                  <p className="font-['SUIT:Medium',sans-serif] h-[54px] leading-[1.5] overflow-hidden text-[12px] text-ellipsis text-white w-full">{intro}</p>
+                <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full">
+                  <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] overflow-hidden text-[27px] text-ellipsis text-white w-full whitespace-nowrap">{cleanTitle(item.title)}</p>
+                  {castText && (
+                    <div className="w-full">
+                      <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-white/55 mb-[2px]">출연진</p>
+                      <p className="font-['SUIT:Medium',sans-serif] leading-[1.45] text-[13px] text-white w-full">{castText}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-            <Actors cast={item.cast} />
           </div>
           <div className="content-stretch flex flex-col gap-[16px] items-start p-[15px] relative shrink-0 w-full">
             {times.length > 0 && (
-              <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
+              <div className="flex flex-col gap-[6px] items-start relative shrink-0 w-full">
                 {item.dayLabel && (
                   <p className="font-['SUIT:Bold',sans-serif] text-[#121212] text-[13px] whitespace-nowrap">{item.dayLabel}</p>
                 )}
-                {times.map((t) => (
-                  <div key={t} className="bg-white content-stretch flex flex-col gap-[2px] items-center justify-center px-[10px] py-[6px] relative rounded-[4px] shrink-0 w-[80px]">
-                    <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[4px]" />
-                    <p className="font-['SUIT:ExtraBold',sans-serif] text-[#121212] text-[15px] text-center">{t}</p>
-                  </div>
-                ))}
+                <div className="flex flex-wrap gap-[6px] w-full">
+                  {times.map((t) => (
+                    <div key={t} className="bg-white content-stretch flex items-center justify-center px-[8px] py-[6px] relative rounded-[4px] shrink-0 w-[76px]">
+                      <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[4px]" />
+                      <p className="font-['SUIT:ExtraBold',sans-serif] text-[#121212] text-[15px] text-center">{t}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
             <div className="content-stretch flex flex-col items-start relative shrink-0 w-full gap-[6px]">
               <div className="content-stretch flex gap-[6px] items-center pr-[4px] relative w-full">
                 <IconLocation />
                 <MarqueeText text={item.venue} className="flex-[1_0_0] font-['SUIT:Medium',sans-serif] min-w-px text-[15px] text-black" />
+                {seatText && (
+                  <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#666] whitespace-nowrap shrink-0">{seatText}</p>
+                )}
               </div>
               <div className="content-stretch flex gap-[6px] items-center pr-[4px] relative w-full">
                 <IconCalendar />
                 <p className="font-['SUIT:Medium',sans-serif] overflow-hidden text-[#121212] text-[15px] text-ellipsis whitespace-nowrap">{fmtPeriod(item.periodFrom, item.periodTo)}</p>
               </div>
+              {(host || organizer) && (
+                <div className="flex gap-[12px] items-center w-full pl-[2px] pt-[2px]">
+                  {host && (
+                    <p className="font-['SUIT:Medium',sans-serif] text-[11px] text-[#888] overflow-hidden text-ellipsis whitespace-nowrap max-w-[130px]">
+                      <span className="text-[#bbb]">주최</span> {host}
+                    </p>
+                  )}
+                  {organizer && (
+                    <p className="font-['SUIT:Medium',sans-serif] text-[11px] text-[#888] overflow-hidden text-ellipsis whitespace-nowrap max-w-[130px]">
+                      <span className="text-[#bbb]">주관</span> {organizer}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

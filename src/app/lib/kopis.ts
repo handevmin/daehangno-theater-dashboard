@@ -29,6 +29,8 @@ export interface PlayItem {
   prfdtcnt: number
   seatScale: number
   openrun?: boolean
+  host?: string // 주최
+  organizer?: string // 주관
   state: string
   reservations: Reservation[]
   // "곧 시작할 회차" 전용 (upcoming 항목에만 존재)
