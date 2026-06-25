@@ -202,16 +202,19 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
                 <p className="font-['SUIT:Medium',sans-serif] overflow-hidden text-[#121212] text-[15px] text-ellipsis whitespace-nowrap">{fmtPeriod(item.periodFrom, item.periodTo)}</p>
               </div>
               {(host || organizer) && (
-                <div className="flex gap-[12px] items-center w-full pl-[2px] pt-[2px]">
+                <div className="flex items-stretch gap-[14px] w-full pt-[6px]">
                   {host && (
-                    <p className="font-['SUIT:Medium',sans-serif] text-[11px] text-[#888] overflow-hidden text-ellipsis whitespace-nowrap max-w-[130px]">
-                      <span className="text-[#bbb]">주최</span> {host}
-                    </p>
+                    <div className="flex flex-col gap-[3px] min-w-0">
+                      <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#999]">주최</p>
+                      <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#333] overflow-hidden text-ellipsis whitespace-nowrap max-w-[110px]">{host}</p>
+                    </div>
                   )}
+                  {host && organizer && <div className="w-px self-stretch bg-[#d5d5d5] shrink-0" />}
                   {organizer && (
-                    <p className="font-['SUIT:Medium',sans-serif] text-[11px] text-[#888] overflow-hidden text-ellipsis whitespace-nowrap max-w-[130px]">
-                      <span className="text-[#bbb]">주관</span> {organizer}
-                    </p>
+                    <div className="flex flex-col gap-[3px] min-w-0">
+                      <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#999]">주관</p>
+                      <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#333] overflow-hidden text-ellipsis whitespace-nowrap max-w-[110px]">{organizer}</p>
+                    </div>
                   )}
                 </div>
               )}
