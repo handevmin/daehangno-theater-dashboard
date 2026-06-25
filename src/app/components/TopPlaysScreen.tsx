@@ -143,7 +143,7 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
             <ImageWithFallback alt={item.title} className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={proxyImg(item.poster)} />
           </div>
         </div>
-        <div className="bg-[#f7f8f9] content-stretch flex flex-col h-[502px] items-start justify-between relative shrink-0 w-[282px]">
+        <div className="bg-[#f7f8f9] content-stretch flex flex-col h-[502px] items-start relative shrink-0 w-[282px]">
           <div aria-hidden className="absolute border-3 border-[#121212] border-solid inset-[-3px] pointer-events-none" />
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full">
             <div className="bg-[#121212] relative shrink-0 w-full">
@@ -173,7 +173,7 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
               </div>
             </div>
           </div>
-          <div className="content-stretch flex flex-col gap-[16px] items-start p-[15px] relative shrink-0 w-full">
+          <div className="content-stretch flex flex-col gap-[14px] items-start px-[15px] pt-[15px] relative shrink-0 w-full">
             {times.length > 0 && (
               <div className="flex flex-col gap-[6px] items-start relative shrink-0 w-full">
                 {item.dayLabel && (
@@ -201,25 +201,25 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
                 <IconCalendar />
                 <p className="font-['SUIT:Medium',sans-serif] overflow-hidden text-[#121212] text-[15px] text-ellipsis whitespace-nowrap">{fmtPeriod(item.periodFrom, item.periodTo)}</p>
               </div>
-              {(host || organizer) && (
-                <div className="flex items-stretch gap-[14px] w-full pt-[6px]">
-                  {host && (
-                    <div className="flex flex-col gap-[3px] min-w-0">
-                      <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#999]">주최</p>
-                      <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#333] overflow-hidden text-ellipsis whitespace-nowrap max-w-[110px]">{host}</p>
-                    </div>
-                  )}
-                  {host && organizer && <div className="w-px self-stretch bg-[#d5d5d5] shrink-0" />}
-                  {organizer && (
-                    <div className="flex flex-col gap-[3px] min-w-0">
-                      <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#999]">주관</p>
-                      <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#333] overflow-hidden text-ellipsis whitespace-nowrap max-w-[110px]">{organizer}</p>
-                    </div>
-                  )}
+            </div>
+          </div>
+          {(host || organizer) && (
+            <div className="flex items-stretch gap-[14px] w-full px-[15px] pb-[16px] mt-auto">
+              {host && (
+                <div className="flex flex-col gap-[3px] min-w-0">
+                  <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#999]">주최</p>
+                  <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#333] overflow-hidden text-ellipsis whitespace-nowrap max-w-[110px]">{host}</p>
+                </div>
+              )}
+              {host && organizer && <div className="w-px self-stretch bg-[#d5d5d5] shrink-0" />}
+              {organizer && (
+                <div className="flex flex-col gap-[3px] min-w-0">
+                  <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#999]">주관</p>
+                  <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#333] overflow-hidden text-ellipsis whitespace-nowrap max-w-[110px]">{organizer}</p>
                 </div>
               )}
             </div>
-          </div>
+          )}
         </div>
       </div>
       <div className="absolute left-[-40px] size-[100px] top-[-40px]">
