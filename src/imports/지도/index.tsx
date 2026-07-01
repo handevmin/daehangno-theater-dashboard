@@ -209,7 +209,7 @@ function MarkerPin({ item, pos }: { item?: PlayItem; pos: { x: number; y: number
 // 서울연극센터 — 고정 핀 + 아래 라벨 (공연장 핀과 달리 상시 표시되는 랜드마크)
 function TheaterCenterMarker() {
   const x = 344;
-  const y = 300; // 건물 자리(핀 발끝)
+  const y = 320; // 핀 발끝 (건물 자리보다 살짝 아래)
   return (
     <div className="absolute inset-0 z-[19] pointer-events-none" data-name="TheaterCenter">
       {/* 핀 (발끝이 y에 닿고 몸통은 위로) */}
