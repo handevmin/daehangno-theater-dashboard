@@ -1006,9 +1006,6 @@ export default function Component({ data }: { data: DashboardData }) {
         </div>
       </div>
       <TodaySeatsBox todaySeats={data.todaySeats} deltaPct={data.weekDeltaPct} />
-      {/* 공스피 타원 아래 → 위 장식선(1110·1320)과 정렬해 이어지는 세로선. 왼쪽은 구분선(104)까지, 오른쪽은 리스트(219)까지. */}
-      <div className="absolute bg-[#121212] w-[3px] left-[1109px] top-[86px] h-[18px]" />
-      <div className="absolute bg-[#121212] w-[3px] left-[1319px] top-[86px] h-[133px]" />
       <Contents items={mapItems} activeIdx={activeIdx} apiVenues={apiVenues} />
     </div>
   );
