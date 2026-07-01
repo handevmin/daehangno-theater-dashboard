@@ -109,7 +109,7 @@ function Card({ item }: { item: PlayItem }) {
     <div className="content-stretch flex flex-col h-[312px] items-start relative shrink-0 w-[204px]" data-name="Wrap">
       <div aria-hidden className="absolute border border-[#121212] border-solid inset-[-1px] pointer-events-none" />
       <div className="h-[272px] relative shrink-0 w-[204px] overflow-hidden" data-name="image">
-        <ImageWithFallback alt={item.title} className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={proxyImg(item.poster)} />
+        <ImageWithFallback alt={item.title} className="absolute inset-0 max-w-none object-cover object-top pointer-events-none size-full" src={proxyImg(item.poster)} />
       </div>
       <div className="h-[40px] relative shrink-0 w-full" data-name="Title">
         <div aria-hidden className="absolute border-[#121212] border-solid border-t inset-[-0.5px_0_0_0] pointer-events-none" />
@@ -119,7 +119,7 @@ function Card({ item }: { item: PlayItem }) {
           </div>
         </div>
       </div>
-      <div className="absolute bg-[#121212] content-stretch flex h-[42px] items-center justify-between left-0 px-[4px] py-[10px] top-0 w-[204px]" data-name="Title">
+      <div className="absolute content-stretch flex h-[56px] items-start justify-between left-0 px-[4px] py-[8px] top-0 w-[204px]" style={{ background: "linear-gradient(to bottom, rgba(18,18,18,0.9) 0%, rgba(18,18,18,0.55) 45%, rgba(18,18,18,0) 100%)" }} data-name="Title">
         <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
           <div className="content-stretch flex items-center justify-center px-[8px] relative shrink-0" data-name="Rank">
             <p className="[word-break:break-word] font-['SUIT:Bold',sans-serif] leading-[normal] not-italic relative shrink-0 text-[16px] text-white whitespace-nowrap">{item.rank}위</p>
@@ -156,9 +156,9 @@ function DayOfWeekChart({ data }: { data: DashboardData }) {
   const peakIdx = days.reduce((bi, d, i, a) => (d.count > a[bi].count ? i : bi), 0); // 최다 상연일 강조
   return (
     <>
-    <div className="absolute border-2 border-[#121212] border-solid h-[194px] left-[866px] overflow-clip top-[133px] w-[531px]" data-name="Box">
-      <div className="absolute bg-[#121212] h-[194px] left-[-2px] overflow-clip top-[-2px] w-[208px]" data-name="Title">
-        <p className="[word-break:keep-all] absolute font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[1.15] left-[12px] not-italic text-[26px] text-white top-[12px] w-[150px]">요일별 공연 회차</p>
+    <div className="absolute border-2 border-[#121212] border-solid h-[194px] left-[816px] overflow-clip top-[133px] w-[581px]" data-name="Box">
+      <div className="absolute bg-[#121212] h-[194px] left-[-2px] overflow-clip top-[-2px] w-[258px]" data-name="Title">
+        <p className="[word-break:break-word] absolute font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[normal] left-[12px] not-italic text-[26px] text-white top-[12px] whitespace-nowrap">요일별 공연 회차</p>
         <div className="absolute content-stretch flex flex-col gap-[28px] items-end justify-center right-0 top-[21px]" data-name="Wrap">
           {axis.map((v) => (
             <div key={v} className="content-stretch flex gap-[4px] items-center relative shrink-0">
@@ -168,7 +168,7 @@ function DayOfWeekChart({ data }: { data: DashboardData }) {
           ))}
         </div>
       </div>
-      <div className="absolute h-[194px] left-[206px] overflow-clip top-[-2px] w-[323px]" data-name="Chart">
+      <div className="absolute h-[194px] left-[256px] overflow-clip top-[-2px] w-[323px]" data-name="Chart">
         {days.map((d, i) => {
           const h = Math.max(4, (d.count / (step * 4)) * chartH);
           const isToday = i === peakIdx;
@@ -213,7 +213,7 @@ function WeeklyTrendChart({ data }: { data: DashboardData }) {
   const last = coords[coords.length - 1];
   return (
     <>
-    <div className="absolute border-2 border-[#121212] border-solid h-[194px] left-[154px] overflow-clip top-[133px] w-[690px]" data-name="Box">
+    <div className="absolute border-2 border-[#121212] border-solid h-[194px] left-[154px] overflow-clip top-[133px] w-[640px]" data-name="Box">
       <div className="absolute bg-[#121212] h-[194px] left-[-2px] overflow-clip top-[-2px] w-[226px]" data-name="Title">
         <p className="[word-break:break-word] absolute font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[normal] left-[12px] not-italic text-[26px] text-white top-[12px] whitespace-nowrap">주간 공스피</p>
         <div className="absolute content-stretch flex flex-col gap-[28px] items-end justify-center right-0 top-[21px]" data-name="Wrap">
@@ -233,8 +233,8 @@ function WeeklyTrendChart({ data }: { data: DashboardData }) {
           </div>
         </div>
       </div>
-      <div className="absolute h-[194px] left-[224px] overflow-clip top-[-2px] w-[464px]" data-name="Chart">
-        <div className="absolute h-[126px] left-0 top-[28px] w-[464px]">
+      <div className="absolute h-[194px] left-[224px] overflow-clip top-[-2px] w-[414px]" data-name="Chart">
+        <div className="absolute h-[126px] left-0 top-[28px] w-[414px]">
           <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 464 127">
             <line stroke="#121212" strokeDasharray="2 2" strokeOpacity="0.2" x2="464" y1="0.5" y2="0.5" />
             <line stroke="#121212" strokeDasharray="2 2" strokeOpacity="0.2" x2="464" y1="42.5" y2="42.5" />
@@ -242,7 +242,7 @@ function WeeklyTrendChart({ data }: { data: DashboardData }) {
             <line stroke="#121212" strokeDasharray="2 2" strokeOpacity="0.2" x2="464" y1="126.5" y2="126.5" />
           </svg>
         </div>
-        <div className="absolute h-[194px] left-0 top-0 w-[464px]">
+        <div className="absolute h-[194px] left-0 top-0 w-[414px]">
           <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 464 194">
             <path d={path} stroke="black" strokeWidth="2" fill="none" />
             {coords.map((c, i) => (
@@ -258,7 +258,7 @@ function WeeklyTrendChart({ data }: { data: DashboardData }) {
       </div>
     </div>
     {/* x축 주차 라벨 — 박스 overflow-clip 밖(아래)에 배치해야 잘리지 않음 (피그마와 동일) */}
-    <div className="[word-break:break-word] absolute content-stretch flex font-['SUIT:Bold',sans-serif] items-center justify-between leading-[normal] left-[402px] not-italic text-[12px] text-black text-center top-[337px] tracking-[-0.36px] w-[440px]">
+    <div className="[word-break:break-word] absolute content-stretch flex font-['SUIT:Bold',sans-serif] items-center justify-between leading-[normal] left-[402px] not-italic text-[12px] text-black text-center top-[337px] tracking-[-0.36px] w-[375px]">
       {pts.map((p, i) => (
         <p key={i} className="relative shrink-0 whitespace-nowrap">{p.label}</p>
       ))}
