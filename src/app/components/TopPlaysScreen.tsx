@@ -167,13 +167,13 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
                     <div className="flex items-center gap-[12px] w-full">
                       {runtimeText && (
                         <p className="font-['SUIT:Medium',sans-serif] text-[13px] text-white whitespace-nowrap">
-                          <span className="font-['SUIT:Bold',sans-serif] text-[#c2a56b]">러닝타임</span> {runtimeText}
+                          <span className="font-['SUIT:Bold',sans-serif] text-white" style={{ textDecoration: "underline", textDecorationColor: "#c2a56b", textDecorationThickness: "4px", textUnderlineOffset: "1px" }}>러닝타임</span> {runtimeText}
                         </p>
                       )}
                       {runtimeText && ageText && <div className="w-px h-[16px] bg-white/30 shrink-0" />}
                       {ageText && (
                         <p className="font-['SUIT:Medium',sans-serif] text-[13px] text-white whitespace-nowrap">
-                          <span className="font-['SUIT:Bold',sans-serif] text-[#c2a56b]">관람연령</span> {ageText}
+                          <span className="font-['SUIT:Bold',sans-serif] text-white" style={{ textDecoration: "underline", textDecorationColor: "#c2a56b", textDecorationThickness: "4px", textUnderlineOffset: "1px" }}>관람연령</span> {ageText}
                         </p>
                       )}
                     </div>
