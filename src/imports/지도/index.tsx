@@ -206,12 +206,10 @@ function MarkerPin({ item, pos }: { item?: PlayItem; pos: { x: number; y: number
   );
 }
 
-// 서울연극센터 — 고정 핀 + 아래 라벨 (공연장 핀과 달리 상시 표시되는 랜드마크)
-function TheaterCenterMarker() {
-  const x = 344;
-  const y = 320; // 핀 발끝 (건물 자리보다 살짝 아래)
+// 랜드마크 — 고정 핀 + 아래 라벨 (공연장 핀과 달리 상시 표시. 서울연극센터/대학로극장 쿼드 등)
+function LandmarkMarker({ x, y, label }: { x: number; y: number; label: string }) {
   return (
-    <div className="absolute inset-0 z-[19] pointer-events-none" data-name="TheaterCenter">
+    <div className="absolute inset-0 z-[19] pointer-events-none" data-name="Landmark">
       {/* 핀 (발끝이 y에 닿고 몸통은 위로) */}
       <svg
         width="24"
@@ -229,7 +227,7 @@ function TheaterCenterMarker() {
         className="absolute bg-[#121212] text-white font-['SUIT:Bold',sans-serif] text-[11px] leading-[normal] px-[8px] py-[3px] rounded-[6px] whitespace-nowrap"
         style={{ left: x, top: y + 3, transform: "translate(-50%, 0)" }}
       >
-        서울연극센터
+        {label}
       </div>
     </div>
   );
@@ -875,7 +873,8 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
           <p className="leading-[18px]">연건캠퍼스/병원</p>
         </div>
         <Station />
-        <TheaterCenterMarker />
+        <LandmarkMarker x={344} y={320} label="서울연극센터" />
+        <LandmarkMarker x={293} y={144} label="대학로극장 쿼드" />
         {showEdit ? (
           <EditOverlay innerRef={innerRef} apiVenues={apiVenues} />
         ) : showAllPins ? (
