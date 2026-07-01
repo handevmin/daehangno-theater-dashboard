@@ -206,6 +206,35 @@ function MarkerPin({ item, pos }: { item?: PlayItem; pos: { x: number; y: number
   );
 }
 
+// 서울연극센터 — 고정 핀 + 아래 라벨 (공연장 핀과 달리 상시 표시되는 랜드마크)
+function TheaterCenterMarker() {
+  const x = 344;
+  const y = 300; // 건물 자리(핀 발끝)
+  return (
+    <div className="absolute inset-0 z-[19] pointer-events-none" data-name="TheaterCenter">
+      {/* 핀 (발끝이 y에 닿고 몸통은 위로) */}
+      <svg
+        width="24"
+        height="31"
+        viewBox="0 0 28 36"
+        fill="none"
+        className="absolute"
+        style={{ left: x, top: y, transform: "translate(-50%, -100%)" }}
+      >
+        <path d="M14 35C14 35 25 23 25 13A11 11 0 1 0 3 13C3 23 14 35 14 35Z" fill="#121212" stroke="#ffffff" strokeWidth="1.5" />
+        <circle cx="14" cy="13" r="4" fill="#ffffff" />
+      </svg>
+      {/* 라벨 — 핀 아래 */}
+      <div
+        className="absolute bg-[#121212] text-white font-['SUIT:Bold',sans-serif] text-[11px] leading-[normal] px-[8px] py-[3px] rounded-[6px] whitespace-nowrap"
+        style={{ left: x, top: y + 3, transform: "translate(-50%, 0)" }}
+      >
+        서울연극센터
+      </div>
+    </div>
+  );
+}
+
 function Frame() {
   return (
     <div className="absolute h-[720px] left-0 top-0 w-[117px]">
@@ -455,11 +484,7 @@ function Exit3() {
 function Station() {
   return (
     <div className="absolute contents inset-[41.92%_29.52%_37.54%_39.13%]" style={{ containerType: "size" }} data-name="Station">
-      <div className="absolute flex h-[49.477px] items-center justify-center left-[326px] top-[278px] w-[91.243px]">
-        <div className="flex-none rotate-[-9.19deg]">
-          <Logo />
-        </div>
-      </div>
+      {/* 서울연극센터 건물 아이콘/텍스트(Logo)는 핀+라벨(TheaterCenterMarker)로 대체 */}
       <div className="absolute flex inset-[45.84%_31.37%_45.55%_59%] items-center justify-center" style={{ containerType: "size" }}>
         <div className="flex-none h-[hypot(5.49685cqw,83.3975cqh)] rotate-[-6.14deg] w-[hypot(94.5031cqw,-16.6025cqh)]">
           <div className="relative size-full">
@@ -850,6 +875,7 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
           <p className="leading-[18px]">연건캠퍼스/병원</p>
         </div>
         <Station />
+        <TheaterCenterMarker />
         {showEdit ? (
           <EditOverlay innerRef={innerRef} apiVenues={apiVenues} />
         ) : showAllPins ? (
