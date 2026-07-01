@@ -222,10 +222,10 @@ function LandmarkMarker({ x, y, label }: { x: number; y: number; label: string }
         <path d="M14 35C14 35 25 23 25 13A11 11 0 1 0 3 13C3 23 14 35 14 35Z" fill="#121212" stroke="#ffffff" strokeWidth="1.5" />
         <circle cx="14" cy="13" r="4" fill="#ffffff" />
       </svg>
-      {/* 라벨 — 핀 발끝 바로 아래 */}
+      {/* 라벨 — 핀 위 (핀 몸통 31px 위) */}
       <div
         className="absolute bg-[#121212] text-white font-['SUIT:Bold',sans-serif] text-[11px] leading-[normal] px-[8px] py-[3px] rounded-[6px] whitespace-nowrap"
-        style={{ left: x, top: y + 3, transform: "translate(-50%, 0)" }}
+        style={{ left: x, top: y, transform: "translate(-50%, calc(-100% - 34px))" }}
       >
         {label}
       </div>
