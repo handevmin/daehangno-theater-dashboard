@@ -873,7 +873,7 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
           <p className="leading-[18px]">연건캠퍼스/병원</p>
         </div>
         <Station />
-        <LandmarkMarker x={344} y={320} label="서울연극센터" />
+        <LandmarkMarker x={362} y={320} label="서울연극센터" />
         <LandmarkMarker x={293} y={144} label="대학로극장 쿼드" />
         {showEdit ? (
           <EditOverlay innerRef={innerRef} apiVenues={apiVenues} />
