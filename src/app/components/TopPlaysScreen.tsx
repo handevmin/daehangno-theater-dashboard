@@ -161,27 +161,21 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
                     </div>
                   )}
                 </div>
-                <div className="content-stretch flex flex-col gap-[10px] items-start relative shrink-0 w-full">
+                <div className="content-stretch flex flex-col gap-[14px] items-start relative shrink-0 w-full">
                   <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] overflow-hidden text-[27px] text-ellipsis text-white w-full whitespace-nowrap">{cleanTitle(item.title)}</p>
                   {(runtimeText || ageText) && (
-                    <div className="flex items-center gap-[10px] bg-white rounded-[6px] px-[10px] py-[6px] w-full">
+                    <div className="flex items-center gap-[12px] w-full">
                       {runtimeText && (
-                        <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#121212] whitespace-nowrap">
-                          <span className="font-['SUIT:Bold',sans-serif]">러닝타임</span> {runtimeText}
+                        <p className="font-['SUIT:Medium',sans-serif] text-[13px] text-white whitespace-nowrap">
+                          <span className="font-['SUIT:Bold',sans-serif] text-[#c2a56b]">러닝타임</span> {runtimeText}
                         </p>
                       )}
-                      {runtimeText && ageText && <div className="w-px self-stretch bg-[#d5d5d5]" />}
+                      {runtimeText && ageText && <div className="w-px h-[16px] bg-white/30 shrink-0" />}
                       {ageText && (
-                        <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#121212] whitespace-nowrap">
-                          <span className="font-['SUIT:Bold',sans-serif]">관람연령</span> {ageText}
+                        <p className="font-['SUIT:Medium',sans-serif] text-[13px] text-white whitespace-nowrap">
+                          <span className="font-['SUIT:Bold',sans-serif] text-[#c2a56b]">관람연령</span> {ageText}
                         </p>
                       )}
-                    </div>
-                  )}
-                  {castText && (
-                    <div className="w-full">
-                      <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-white/55 mb-[2px]">출연진</p>
-                      <p className="font-['SUIT:Medium',sans-serif] leading-[1.45] text-[13px] text-white w-full">{castText}</p>
                     </div>
                   )}
                 </div>
@@ -189,6 +183,12 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
             </div>
           </div>
           <div className="content-stretch flex flex-col gap-[14px] items-start px-[15px] pt-[15px] relative shrink-0 w-full">
+            {castText && (
+              <div className="w-full">
+                <p className="font-['SUIT:Bold',sans-serif] text-[12px] text-[#121212] mb-[4px]">출연진</p>
+                <p className="font-['SUIT:Medium',sans-serif] leading-[1.5] text-[13px] text-[#121212] w-full">{castText}</p>
+              </div>
+            )}
             <div className="content-stretch flex flex-col items-start relative shrink-0 w-full gap-[6px]">
               <div className="content-stretch flex gap-[6px] items-center pr-[4px] relative w-full">
                 <IconLocation />
