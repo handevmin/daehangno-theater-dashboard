@@ -123,12 +123,12 @@ function IconCalendar() {
 
 function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fadeIn?: boolean }) {
   const reserveUrl = item.reservations[0]?.url || "";
-  const times = item.times; // 오늘 회차 전체
   // 출연진: 이름 목록 (최대 6명 + "외")
   const castText = item.cast.length
     ? item.cast.slice(0, 6).join(", ") + (item.cast.length > 6 ? " 외" : "")
     : "";
-  const seatText = item.seatScale > 0 ? `총 ${item.seatScale}석` : "";
+  const runtimeText = item.runtime || "";
+  const ageText = item.ageNum ? (item.ageNum === "전체" ? "전체관람가" : `${item.ageNum}세`) : "";
   const host = (item.host || "").split(/[,，]/)[0].trim(); // 주최 (대표 1곳)
   const organizer = (item.organizer || "").split(/[,，]/)[0].trim(); // 주관 (대표 1곳)
   return (
@@ -161,8 +161,23 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
                     </div>
                   )}
                 </div>
-                <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full">
+                <div className="content-stretch flex flex-col gap-[10px] items-start relative shrink-0 w-full">
                   <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] overflow-hidden text-[27px] text-ellipsis text-white w-full whitespace-nowrap">{cleanTitle(item.title)}</p>
+                  {(runtimeText || ageText) && (
+                    <div className="flex items-center gap-[10px] bg-white rounded-[6px] px-[10px] py-[6px] w-full">
+                      {runtimeText && (
+                        <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#121212] whitespace-nowrap">
+                          <span className="font-['SUIT:Bold',sans-serif]">러닝타임</span> {runtimeText}
+                        </p>
+                      )}
+                      {runtimeText && ageText && <div className="w-px self-stretch bg-[#d5d5d5]" />}
+                      {ageText && (
+                        <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#121212] whitespace-nowrap">
+                          <span className="font-['SUIT:Bold',sans-serif]">관람연령</span> {ageText}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   {castText && (
                     <div className="w-full">
                       <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-white/55 mb-[2px]">출연진</p>
@@ -174,28 +189,10 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
             </div>
           </div>
           <div className="content-stretch flex flex-col gap-[14px] items-start px-[15px] pt-[15px] relative shrink-0 w-full">
-            {times.length > 0 && (
-              <div className="flex flex-col gap-[6px] items-start relative shrink-0 w-full">
-                {item.dayLabel && (
-                  <p className="font-['SUIT:Bold',sans-serif] text-[#121212] text-[13px] whitespace-nowrap">{item.dayLabel}</p>
-                )}
-                <div className="flex flex-wrap gap-[6px] w-full">
-                  {times.map((t) => (
-                    <div key={t} className="bg-white content-stretch flex items-center justify-center px-[8px] py-[6px] relative rounded-[4px] shrink-0 w-[76px]">
-                      <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[4px]" />
-                      <p className="font-['SUIT:ExtraBold',sans-serif] text-[#121212] text-[15px] text-center">{t}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
             <div className="content-stretch flex flex-col items-start relative shrink-0 w-full gap-[6px]">
               <div className="content-stretch flex gap-[6px] items-center pr-[4px] relative w-full">
                 <IconLocation />
                 <MarqueeText text={item.venue} className="flex-[1_0_0] font-['SUIT:Medium',sans-serif] min-w-px text-[15px] text-black" />
-                {seatText && (
-                  <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#666] whitespace-nowrap shrink-0">{seatText}</p>
-                )}
               </div>
               <div className="content-stretch flex gap-[6px] items-center pr-[4px] relative w-full">
                 <IconCalendar />

@@ -70,9 +70,10 @@ function num(x) {
 }
 function ageNumber(prfage) {
   const s = String(prfage ?? '')
-  const m = s.match(/(\d+)/)
-  if (m) return m[1]
   if (s.includes('전체')) return '전체'
+  // KOPIS는 "만 나이"로 표기(만 13세). 예매 사이트/실제 표기는 한국식 세는 나이(=만+1). 그에 맞춰 +1.
+  const m = s.match(/(\d+)/)
+  if (m) return String(Number(m[1]) + 1)
   return ''
 }
 // dtguidance 에서 HH:MM 추출 (중복 제거, 정렬)
