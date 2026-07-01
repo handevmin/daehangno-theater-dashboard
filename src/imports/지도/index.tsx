@@ -1006,6 +1006,8 @@ export default function Component({ data }: { data: DashboardData }) {
         </div>
       </div>
       <TodaySeatsBox todaySeats={data.todaySeats} deltaPct={data.weekDeltaPct} />
+      {/* 오늘의 공스피 타원 → 곧 공연 예정 리스트 세로 연결선 */}
+      <div className="absolute bg-[#121212] w-[3px] left-[1249px] top-[88px] h-[131px]" />
       <Contents items={mapItems} activeIdx={activeIdx} apiVenues={apiVenues} />
     </div>
   );
