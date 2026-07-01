@@ -21,7 +21,9 @@ function ensureFadeKeyframes() {
   document.head.appendChild(style);
 }
 
-function Frame() {
+// active: 위에서 몇 번째 노드에 불(강조색)이 들어올지 (1~4). Top1-5/6-10=2, 소극장=3.
+function Frame({ active = 2 }: { active?: number }) {
+  const NODE_Y = [175, 263, 351, 439];
   return (
     <div className="absolute h-[720px] left-0 top-0 w-[117px]">
       <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 117 720">
@@ -40,10 +42,9 @@ function Frame() {
             <circle cx="29" cy="683" fill="#C2FFAA" r="12" />
             <circle cx="-25" cy="644" fill="#C2FFAA" r="12" />
           </g>
-          <circle cx="56" cy="175" fill="#4D4D4D" r="12" />
-          <circle cx="56" cy="263" fill="var(--accent)" r="12" />
-          <circle cx="56" cy="351" fill="#4D4D4D" r="12" />
-          <circle cx="56" cy="439" fill="#4D4D4D" r="12" />
+          {NODE_Y.map((cy, i) => (
+            <circle key={cy} cx="56" cy={cy} fill={i + 1 === active ? "var(--accent)" : "#4D4D4D"} r="12" />
+          ))}
           <path d={svgPaths.paaa8180} stroke="white" strokeDasharray="4 4" strokeOpacity="0.9" strokeWidth="3" />
         </g>
         <defs>
@@ -167,13 +168,13 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
                     <div className="flex items-center gap-[12px] w-full">
                       {runtimeText && (
                         <p className="font-['SUIT:Medium',sans-serif] text-[13px] text-white whitespace-nowrap">
-                          <span className="font-['SUIT:Bold',sans-serif] text-white" style={{ textDecoration: "underline", textDecorationColor: "#c2a56b", textDecorationThickness: "4px", textUnderlineOffset: "1px" }}>러닝타임</span> {runtimeText}
+                          <span className="font-['SUIT:Bold',sans-serif] text-white" style={{ textDecoration: "underline", textDecorationColor: "rgba(194,165,107,0.5)", textDecorationThickness: "4px", textUnderlineOffset: "1px", marginRight: "6px" }}>러닝타임</span> {runtimeText}
                         </p>
                       )}
                       {runtimeText && ageText && <div className="w-px h-[16px] bg-white/30 shrink-0" />}
                       {ageText && (
                         <p className="font-['SUIT:Medium',sans-serif] text-[13px] text-white whitespace-nowrap">
-                          <span className="font-['SUIT:Bold',sans-serif] text-white" style={{ textDecoration: "underline", textDecorationColor: "#c2a56b", textDecorationThickness: "4px", textUnderlineOffset: "1px" }}>관람연령</span> {ageText}
+                          <span className="font-['SUIT:Bold',sans-serif] text-white" style={{ textDecoration: "underline", textDecorationColor: "rgba(194,165,107,0.5)", textDecorationThickness: "4px", textUnderlineOffset: "1px", marginRight: "6px" }}>관람연령</span> {ageText}
                         </p>
                       )}
                     </div>
@@ -237,12 +238,14 @@ export function TopPlaysScreen({
   count,
   title,
   list,
+  activeNode = 2,
 }: {
   data: DashboardData;
   start: number; // 0-based 시작 인덱스
   count: number;
   title: string;
   list?: PlayItem[]; // 미지정 시 data.top 사용 (소극장 등 다른 목록 주입용)
+  activeNode?: number; // 좌측 사이드바 노드(불) 위치. Top=2, 소극장=3
 }) {
   const items = (list ?? data.top).slice(start, start + count);
   // 항목을 하나씩 순환 강조(2.8초 간격), 마지막 항목에서 멈춤 → 지도 핀과 동일한 방식
@@ -277,7 +280,7 @@ export function TopPlaysScreen({
   }, [featured?.mt20id]);
   return (
     <div className="bg-[#f7f8f9] relative size-full">
-      <Frame />
+      <Frame active={activeNode} />
       <p className="[word-break:break-word] absolute font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[normal] left-[159px] not-italic text-[#21201c] text-[40px] top-[20px] whitespace-nowrap">{title}</p>
       <div className="absolute h-0 left-[137px] top-[104px] w-[1283px]">
         <div className="absolute inset-[-3px_0_0_0]">
