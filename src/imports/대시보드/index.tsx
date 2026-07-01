@@ -158,7 +158,7 @@ function DayOfWeekChart({ data }: { data: DashboardData }) {
     <>
     <div className="absolute border-2 border-[#121212] border-solid h-[194px] left-[866px] overflow-clip top-[133px] w-[531px]" data-name="Box">
       <div className="absolute bg-[#121212] h-[194px] left-[-2px] overflow-clip top-[-2px] w-[208px]" data-name="Title">
-        <p className="[word-break:break-word] absolute font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[normal] left-[12px] not-italic text-[26px] text-white top-[12px] whitespace-nowrap">요일별 공연 회차</p>
+        <p className="[word-break:keep-all] absolute font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[1.15] left-[12px] not-italic text-[26px] text-white top-[12px] w-[150px]">요일별 공연 회차</p>
         <div className="absolute content-stretch flex flex-col gap-[28px] items-end justify-center right-0 top-[21px]" data-name="Wrap">
           {axis.map((v) => (
             <div key={v} className="content-stretch flex gap-[4px] items-center relative shrink-0">

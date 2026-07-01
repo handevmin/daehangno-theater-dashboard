@@ -90,8 +90,7 @@ function Row({ item, active }: { item: PlayItem; active?: boolean }) {
             </div>
           </div>
           <div className="content-stretch flex gap-[12px] items-center relative shrink-0 w-[390px]">
-            <MarqueeText text={item.venue} className="font-['SUIT:Medium',sans-serif] max-w-[220px] text-[15px] text-black" />
-            {item.ageNum && (<><Sep /><p className="font-['SUIT:Medium',sans-serif] overflow-hidden text-[15px] text-black text-ellipsis whitespace-nowrap">{item.ageNum === "전체" ? "전체" : `${item.ageNum}세`}</p></>)}
+            <MarqueeText text={item.venue} className="font-['SUIT:Medium',sans-serif] max-w-[360px] text-[15px] text-black" />
           </div>
         </div>
       </div>
@@ -186,10 +185,13 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
           <div className="content-stretch flex flex-col gap-[14px] items-start px-[15px] pt-[15px] relative shrink-0 w-full">
             {castText && (
               <div className="w-full">
-                <p className="font-['SUIT:Bold',sans-serif] text-[12px] text-[#121212] mb-[4px]">출연진</p>
+                <p className="font-['SUIT:Bold',sans-serif] text-[15px] text-[#121212] mb-[5px]">출연진</p>
                 <p className="font-['SUIT:Medium',sans-serif] leading-[1.5] text-[13px] text-[#121212] w-full">{castText}</p>
               </div>
             )}
+          </div>
+          {/* 장소·날짜·주최/주관 — 카드 하단에 붙임 */}
+          <div className="flex flex-col gap-[12px] items-start w-full px-[15px] pb-[16px] mt-auto">
             <div className="content-stretch flex flex-col items-start relative shrink-0 w-full gap-[6px]">
               <div className="content-stretch flex gap-[6px] items-center pr-[4px] relative w-full">
                 <IconLocation />
@@ -200,24 +202,24 @@ function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fade
                 <p className="font-['SUIT:Medium',sans-serif] overflow-hidden text-[#121212] text-[15px] text-ellipsis whitespace-nowrap">{fmtPeriod(item.periodFrom, item.periodTo)}</p>
               </div>
             </div>
+            {(host || organizer) && (
+              <div className="flex items-stretch gap-[14px] w-full">
+                {host && (
+                  <div className="flex-1 flex flex-col gap-[3px] min-w-0">
+                    <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#121212]">주최</p>
+                    <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#121212] overflow-hidden text-ellipsis whitespace-nowrap">{host}</p>
+                  </div>
+                )}
+                {host && organizer && <div className="w-px self-stretch bg-[#d5d5d5] shrink-0" />}
+                {organizer && (
+                  <div className="flex-1 flex flex-col gap-[3px] min-w-0">
+                    <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#121212]">주관</p>
+                    <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#121212] overflow-hidden text-ellipsis whitespace-nowrap">{organizer}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-          {(host || organizer) && (
-            <div className="flex items-stretch gap-[14px] w-full px-[15px] pb-[16px] mt-auto">
-              {host && (
-                <div className="flex-1 flex flex-col gap-[3px] min-w-0">
-                  <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#121212]">주최</p>
-                  <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#121212] overflow-hidden text-ellipsis whitespace-nowrap">{host}</p>
-                </div>
-              )}
-              {host && organizer && <div className="w-px self-stretch bg-[#d5d5d5] shrink-0" />}
-              {organizer && (
-                <div className="flex-1 flex flex-col gap-[3px] min-w-0">
-                  <p className="font-['SUIT:Bold',sans-serif] text-[11px] text-[#121212]">주관</p>
-                  <p className="font-['SUIT:Medium',sans-serif] text-[12px] text-[#121212] overflow-hidden text-ellipsis whitespace-nowrap">{organizer}</p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
       <div className="absolute left-[-40px] size-[100px] top-[-40px]">
