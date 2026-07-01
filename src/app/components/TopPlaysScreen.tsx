@@ -123,10 +123,8 @@ function IconCalendar() {
 
 function Featured({ item, badge, fadeIn }: { item: PlayItem; badge: string; fadeIn?: boolean }) {
   const reserveUrl = item.reservations[0]?.url || "";
-  // 출연진: 이름 목록 (최대 6명 + "외")
-  const castText = item.cast.length
-    ? item.cast.slice(0, 6).join(", ") + (item.cast.length > 6 ? " 외" : "")
-    : "";
+  // 출연진: KOPIS가 준 이름 전부 표시 (칸이 충분하므로 자르지 않음)
+  const castText = item.cast.join(", ");
   const runtimeText = item.runtime || "";
   const ageText = item.ageNum ? (item.ageNum === "전체" ? "전체관람가" : `${item.ageNum}세`) : "";
   const host = (item.host || "").split(/[,，]/)[0].trim(); // 주최 (대표 1곳)
