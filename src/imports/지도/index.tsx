@@ -224,10 +224,10 @@ function TheaterCenterMarker() {
         <path d="M14 35C14 35 25 23 25 13A11 11 0 1 0 3 13C3 23 14 35 14 35Z" fill="#121212" stroke="#ffffff" strokeWidth="1.5" />
         <circle cx="14" cy="13" r="4" fill="#ffffff" />
       </svg>
-      {/* 라벨 — 핀 아래 */}
+      {/* 라벨 — 핀 아래 (4번 출구 피해 살짝 내림) */}
       <div
         className="absolute bg-[#121212] text-white font-['SUIT:Bold',sans-serif] text-[11px] leading-[normal] px-[8px] py-[3px] rounded-[6px] whitespace-nowrap"
-        style={{ left: x, top: y + 3, transform: "translate(-50%, 0)" }}
+        style={{ left: x, top: y + 14, transform: "translate(-50%, 0)" }}
       >
         서울연극센터
       </div>
