@@ -1,32 +1,12 @@
 import svgPaths from "../../imports/대시보드/svg-n9g4xv87w2";
 import { fmtNum } from "../lib/kopis";
 
-// 화면 상단의 작은 세로 bar 2개 (원본 디자인 — 박스 위 1110px / 1320px 지점)
+// 화면 상단의 세로 장식선 2개 (박스 위 1110px / 1320px 지점) — 타원 위까지 내려 붙게(y0~22, 타원 top=20).
 function TopBars() {
   return (
     <>
-      <div className="absolute flex h-[16px] items-center justify-center left-[1110px] top-0 w-0">
-        <div className="flex-none rotate-90">
-          <div className="h-0 relative w-[16px]">
-            <div className="absolute inset-[-3px_0_0_0]">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 3">
-                <line stroke="#121212" strokeWidth="3" x2="16" y1="1.5" y2="1.5" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="absolute flex h-[16px] items-center justify-center left-[1320px] top-0 w-0">
-        <div className="flex-none rotate-90">
-          <div className="h-0 relative w-[16px]">
-            <div className="absolute inset-[-3px_0_0_0]">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 16 3">
-                <line stroke="#121212" strokeWidth="3" x2="16" y1="1.5" y2="1.5" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="absolute bg-[#121212] w-[3px] left-[1109px] top-0 h-[22px]" />
+      <div className="absolute bg-[#121212] w-[3px] left-[1319px] top-0 h-[22px]" />
     </>
   );
 }
