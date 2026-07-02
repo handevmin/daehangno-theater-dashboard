@@ -102,8 +102,8 @@ function ArrowUpRight() {
 
 function Wrap1() {
   return (
-    <div className="-translate-x-1/2 [word-break:break-word] absolute content-stretch flex flex-col items-start left-[calc(50%+446px)] not-italic top-[27px] w-[104px]" data-name="wrap">
-      <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[24px] relative shrink-0 text-[#ffb73b] text-[13px] tracking-[0.52px] uppercase w-full">Live Curating</p>
+    <div className="-translate-x-1/2 [word-break:break-word] absolute content-stretch flex flex-col items-start left-[calc(50%+428px)] not-italic top-[27px] w-[140px]" data-name="wrap">
+      <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[24px] relative shrink-0 text-[#ffb73b] text-[13px] tracking-[0.52px] uppercase w-full whitespace-nowrap">Live Curating</p>
       <p className="font-['Elice_DigitalBaeum_OTF:Regular',sans-serif] leading-[normal] relative shrink-0 text-[16px] text-[rgba(255,255,255,0.6)] tracking-[-0.32px] w-full">실시간 추천</p>
     </div>
   );
