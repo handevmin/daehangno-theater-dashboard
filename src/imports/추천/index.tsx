@@ -43,7 +43,7 @@ function Frame() {
             <circle cx="56" cy="175" r="9.5" stroke="var(--stroke-0, white)" strokeOpacity="0.2" strokeWidth="5" />
           </g>
           <g id="Ellipse 2">
-            <ellipse cx="56" cy="527.5" fill="var(--fill-0, #FFB73B)" rx="12" ry="11.5" />
+            <ellipse cx="56" cy="527.5" fill="var(--fill-0, var(--accent))" rx="12" ry="11.5" />
             <path d={svgPaths.p30565400} stroke="var(--stroke-0, white)" strokeOpacity="0.2" strokeWidth="5" />
           </g>
           <g id="Ellipse 3">
@@ -73,7 +73,7 @@ function Frame() {
 function Wrap() {
   return (
     <div className="[word-break:break-word] absolute content-stretch flex font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] gap-[6px] items-center leading-[normal] left-[36px] not-italic text-[34px] top-[25px] whitespace-nowrap" data-name="wrap">
-      <p className="relative shrink-0 text-[#ffb73b]">서울연극센터</p>
+      <p className="relative shrink-0 text-[var(--accent)]">서울연극센터</p>
       <p className="relative shrink-0 text-white">가 추천하는 오늘의 공연</p>
     </div>
   );
@@ -103,7 +103,7 @@ function ArrowUpRight() {
 function Wrap1() {
   return (
     <div className="-translate-x-1/2 [word-break:break-word] absolute content-stretch flex flex-col items-start left-[calc(50%+428px)] not-italic top-[27px] w-[140px]" data-name="wrap">
-      <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[24px] relative shrink-0 text-[#ffb73b] text-[13px] tracking-[0.52px] uppercase w-full whitespace-nowrap">Live Curating</p>
+      <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[24px] relative shrink-0 text-[var(--accent)] text-[13px] tracking-[0.52px] uppercase w-full whitespace-nowrap">Live Curating</p>
       <p className="font-['Elice_DigitalBaeum_OTF:Regular',sans-serif] leading-[normal] relative shrink-0 text-[16px] text-[rgba(255,255,255,0.6)] tracking-[-0.32px] w-full">실시간 추천</p>
     </div>
   );
@@ -114,7 +114,7 @@ function Group2() {
     <div className="-translate-x-1/2 absolute contents left-[calc(50%+437px)] top-[27px]">
       <div className="-translate-x-1/2 absolute left-[calc(50%+380px)] size-[8px] top-[36px]">
         <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 8">
-          <circle cx="4" cy="4" fill="var(--fill-0, #FFB73B)" id="Ellipse 65" r="4" />
+          <circle cx="4" cy="4" fill="var(--fill-0, var(--accent))" id="Ellipse 65" r="4" />
         </svg>
       </div>
       <Wrap1 />
@@ -237,7 +237,7 @@ function Wrap5() {
 
 function Wrap3() {
   return (
-    <div className="bg-[#ffb73b] content-stretch flex flex-col h-[367px] items-center justify-between py-[6px] relative rounded-[12px] shrink-0 w-full" data-name="Wrap">
+    <div className="bg-[var(--accent)] content-stretch flex flex-col h-[367px] items-center justify-between py-[6px] relative rounded-[12px] shrink-0 w-full" data-name="Wrap">
       <div aria-hidden className="absolute border-[2.5px] border-black border-solid inset-0 pointer-events-none rounded-[12px]" />
       <Top />
       <Wrap5 />
@@ -483,7 +483,7 @@ function Wrap14() {
 function Component1Line() {
   return (
     <div className="bg-[rgba(255,183,59,0.2)] relative rounded-[5px] shrink-0 w-full" data-name="1-line">
-      <div aria-hidden className="absolute border border-[#ffb73b] border-solid inset-0 pointer-events-none rounded-[5px]" />
+      <div aria-hidden className="absolute border border-[var(--accent)] border-solid inset-0 pointer-events-none rounded-[5px]" />
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex items-center p-[10px] relative size-full">
           <p className="[word-break:break-word] flex-[1_0_0] font-['SUIT:Bold',sans-serif] leading-[normal] min-w-px not-italic overflow-hidden relative text-[16px] text-black text-ellipsis whitespace-nowrap">“계절의 경계에서 피어나는 섬세한 감정선”</p>
@@ -679,7 +679,7 @@ function Wrap22() {
 function Component1Line1() {
   return (
     <div className="bg-[rgba(255,183,59,0.2)] relative rounded-[5px] shrink-0 w-full" data-name="1-line">
-      <div aria-hidden className="absolute border border-[#ffb73b] border-solid inset-0 pointer-events-none rounded-[5px]" />
+      <div aria-hidden className="absolute border border-[var(--accent)] border-solid inset-0 pointer-events-none rounded-[5px]" />
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex items-center p-[10px] relative size-full">
           <p className="[word-break:break-word] flex-[1_0_0] font-['SUIT:Bold',sans-serif] leading-[normal] min-w-px not-italic overflow-hidden relative text-[16px] text-black text-ellipsis whitespace-nowrap">“계절의 경계에서 피어나는 섬세한 감정선”</p>
@@ -719,7 +719,7 @@ function Frame1() {
       <div className="absolute left-0 size-[53.922px] top-0">
         <div className="absolute inset-[0_0.76%_3.02%_0.76%]">
           <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 53.1024 52.2956">
-            <path d={svgPaths.p2066ca72} fill="var(--fill-0, #FFB73B)" id="Star 13" stroke="var(--stroke-0, black)" strokeWidth="1.61765" />
+            <path d={svgPaths.p2066ca72} fill="var(--fill-0, var(--accent))" id="Star 13" stroke="var(--stroke-0, black)" strokeWidth="1.61765" />
           </svg>
         </div>
       </div>
@@ -734,7 +734,7 @@ function Frame2() {
       <div className="absolute left-0 size-[53.922px] top-0">
         <div className="absolute inset-[0_0.76%_3.02%_0.76%]">
           <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 53.1024 52.2956">
-            <path d={svgPaths.p2066ca72} fill="var(--fill-0, #FFB73B)" id="Star 13" stroke="var(--stroke-0, black)" strokeWidth="1.61765" />
+            <path d={svgPaths.p2066ca72} fill="var(--fill-0, var(--accent))" id="Star 13" stroke="var(--stroke-0, black)" strokeWidth="1.61765" />
           </svg>
         </div>
       </div>

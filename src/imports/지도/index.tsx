@@ -286,6 +286,10 @@ function Frame() {
             <circle cx="56" cy="439" fill="var(--fill-0, #4D4D4D)" r="12" />
             <circle cx="56" cy="439" r="9.5" stroke="var(--stroke-0, white)" strokeOpacity="0.2" strokeWidth="5" />
           </g>
+          <g id="Ellipse 4b">
+            <circle cx="56" cy="527" fill="var(--fill-0, #4D4D4D)" r="12" />
+            <circle cx="56" cy="527" r="9.5" stroke="var(--stroke-0, white)" strokeOpacity="0.2" strokeWidth="5" />
+          </g>
           <path d={svgPaths.p2623c00} id="Vector 1" stroke="var(--stroke-0, white)" strokeDasharray="4 4" strokeOpacity="0.9" strokeWidth="3" />
         </g>
         <defs>

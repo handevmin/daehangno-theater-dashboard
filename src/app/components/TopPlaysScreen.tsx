@@ -23,7 +23,7 @@ function ensureFadeKeyframes() {
 
 // active: 위에서 몇 번째 노드에 불(강조색)이 들어올지 (1~4). Top1-5/6-10=2, 소극장=3.
 function Frame({ active = 2 }: { active?: number }) {
-  const NODE_Y = [175, 263, 351, 439];
+  const NODE_Y = [175, 263, 351, 439, 527];
   return (
     <div className="absolute h-[720px] left-0 top-0 w-[117px]">
       <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 117 720">
