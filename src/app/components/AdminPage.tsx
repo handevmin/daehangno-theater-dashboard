@@ -2,14 +2,6 @@ import { useEffect, useState } from "react";
 import CurationComponent, { type CurationEdit } from "../../imports/추천";
 import { CURATION, emptyPlay, type CurationStore, type CurationContent, type CurationPlay } from "../lib/curation";
 
-const EDIT_KEY = (() => {
-  try {
-    return new URLSearchParams(window.location.search).get("key") || "";
-  } catch {
-    return "";
-  }
-})();
-
 const fmtDate = (d: Date) =>
   `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
 
@@ -153,14 +145,13 @@ export default function AdminPage() {
     setSaving(true);
     setMsg("저장 중…");
     try {
-      const res = await fetch("/api/save-curation" + (EDIT_KEY ? `?key=${encodeURIComponent(EDIT_KEY)}` : ""), {
+      const res = await fetch("/api/save-curation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(store),
       });
       const j = await res.json().catch(() => ({}));
       if (res.ok && j.ok) setMsg("저장됨 ✓ 잠시 후 화면에 반영됩니다");
-      else if (res.status === 401) setMsg("저장 실패(401): 편집 키가 없거나 틀립니다 — 주소를 /admin?key=◯◯◯ 형태로 접속하세요.");
       else setMsg(`저장 실패(${res.status}): ${j.error || "서버 오류"}`);
     } catch {
       setMsg("저장 실패: 네트워크 오류");
@@ -178,13 +169,8 @@ export default function AdminPage() {
         <p style={{ color: "#555", marginTop: 0, fontSize: 14, lineHeight: 1.5 }}>
           아래는 <b>실제 화면 그대로</b>입니다. 글자를 클릭해 바로 고치면 줄바꿈·줄 수가 즉시 반영됩니다.
           공연 카드의 <b>KOPIS 검색</b>으로 공연을 고르면 포스터·공연장·기간·러닝타임·나이가 자동 입력됩니다.
-          AI 페이지는 <b>✨ AI 자동 생성(GPT)</b>으로 오늘의 추천을 불러온 뒤 확인·수정해 저장할 수 있습니다.
+          AI 페이지는 <b>✨ AI 자동 생성</b>으로 오늘의 추천을 불러온 뒤 확인·수정해 저장할 수 있습니다.
         </p>
-        {!EDIT_KEY && (
-          <p style={{ background: "#fff3cd", border: "1px solid #ffe08a", borderRadius: 6, padding: "8px 12px", fontSize: 13, color: "#8a6d00" }}>
-            ⚠ 저장하려면 편집 키가 필요합니다. <b>/admin?key=◯◯◯</b> 형태로 접속하세요.
-          </p>
-        )}
       </div>
 
       {PAGES.map(({ key, source }) => (
@@ -199,7 +185,7 @@ export default function AdminPage() {
                   style={{ fontSize: 13, padding: "6px 14px", background: "#1f6f4f", color: "#fff", border: "none", borderRadius: 6, cursor: generating ? "default" : "pointer", opacity: generating ? 0.6 : 1 }}
                   title="GPT가 오늘의 의미·절기·날씨로 대학로 연극을 추천해 아래를 채웁니다. 확인·수정 후 저장하세요."
                 >
-                  ✨ AI 자동 생성 (GPT)
+                  ✨ AI 자동 생성
                 </button>
                 <span style={{ fontSize: 13, color: genMsg.includes("실패") ? "#c00" : "#2a7", }}>{genMsg}</span>
               </>
