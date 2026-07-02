@@ -54,6 +54,8 @@ export default function AdminPage() {
   const [q, setQ] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [genMsg, setGenMsg] = useState("");
 
   useEffect(() => {
     const update = () => setScale(Math.min(1, (window.innerWidth - 48) / 1440));
@@ -79,6 +81,41 @@ export default function AdminPage() {
     onAddPlay: () => setStore((s) => ({ ...s, [page]: { ...s[page], plays: [...s[page].plays, emptyPlay()] } })),
     onRemovePlay: (i) => setStore((s) => ({ ...s, [page]: { ...s[page], plays: s[page].plays.filter((_, j) => j !== i) } })),
   });
+
+  // AI 자동 생성: GPT가 오늘의 의미·절기·날씨로 추천한 대학로 연극으로 AI 섹션을 채운다(확인·수정 후 저장).
+  const generateAi = async () => {
+    setGenerating(true);
+    setGenMsg("AI가 오늘의 추천을 생성 중… (약 10초)");
+    try {
+      const r = await fetch("/api/ai-curation", { cache: "no-store" });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j?.error || `생성 실패 (${r.status})`);
+      if (!Array.isArray(j?.plays) || !j.plays.length) throw new Error("추천 결과가 비어 있습니다");
+      const content: CurationContent = {
+        hashtag: String(j.hashtag || ""),
+        moodTitle: String(j.moodTitle || ""),
+        moodDesc: String(j.moodDesc || ""),
+        vibe: String(j.vibe || ""),
+        tags: Array.isArray(j.tags) ? j.tags.map((t: any) => String(t)) : [],
+        plays: j.plays.map((p: any) => ({
+          title: String(p.title || ""),
+          venue: String(p.venue || ""),
+          from: String(p.from || ""),
+          to: String(p.to || ""),
+          runtime: String(p.runtime || ""),
+          age: String(p.age || ""),
+          poster: String(p.poster || ""),
+          quote: String(p.quote || ""),
+        })),
+      };
+      setStore((s) => ({ ...s, ai: content }));
+      setGenMsg("생성 완료 — 내용을 확인·수정한 뒤 저장하세요");
+    } catch (e: any) {
+      setGenMsg("생성 실패: " + (e?.message || e));
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const doSearch = async () => {
     if (!q.trim()) return;
@@ -141,6 +178,7 @@ export default function AdminPage() {
         <p style={{ color: "#555", marginTop: 0, fontSize: 14, lineHeight: 1.5 }}>
           아래는 <b>실제 화면 그대로</b>입니다. 글자를 클릭해 바로 고치면 줄바꿈·줄 수가 즉시 반영됩니다.
           공연 카드의 <b>KOPIS 검색</b>으로 공연을 고르면 포스터·공연장·기간·러닝타임·나이가 자동 입력됩니다.
+          AI 페이지는 <b>✨ AI 자동 생성(GPT)</b>으로 오늘의 추천을 불러온 뒤 확인·수정해 저장할 수 있습니다.
         </p>
         {!EDIT_KEY && (
           <p style={{ background: "#fff3cd", border: "1px solid #ffe08a", borderRadius: 6, padding: "8px 12px", fontSize: 13, color: "#8a6d00" }}>
@@ -151,7 +189,22 @@ export default function AdminPage() {
 
       {PAGES.map(({ key, source }) => (
         <div key={key} style={{ maxWidth: 1500, margin: "0 auto", padding: "8px 24px 28px" }}>
-          <div style={{ fontWeight: 700, fontSize: 16, margin: "10px 0 8px" }}>{source}가 추천하는 오늘의 공연</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "10px 0 8px", flexWrap: "wrap" }}>
+            <span style={{ fontWeight: 700, fontSize: 16 }}>{source}가 추천하는 오늘의 공연</span>
+            {key === "ai" && (
+              <>
+                <button
+                  onClick={generateAi}
+                  disabled={generating}
+                  style={{ fontSize: 13, padding: "6px 14px", background: "#1f6f4f", color: "#fff", border: "none", borderRadius: 6, cursor: generating ? "default" : "pointer", opacity: generating ? 0.6 : 1 }}
+                  title="GPT가 오늘의 의미·절기·날씨로 대학로 연극을 추천해 아래를 채웁니다. 확인·수정 후 저장하세요."
+                >
+                  ✨ AI 자동 생성 (GPT)
+                </button>
+                <span style={{ fontSize: 13, color: genMsg.includes("실패") ? "#c00" : "#2a7", }}>{genMsg}</span>
+              </>
+            )}
+          </div>
           <div
             style={{
               width: 1440 * scale,
