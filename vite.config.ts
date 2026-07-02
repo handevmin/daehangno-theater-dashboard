@@ -24,11 +24,15 @@ function kopisDevProxy(mode: string) {
     async configureServer(server: any) {
       const env = loadEnv(mode, process.cwd(), '')
       if (env.KOPIS_SERVICE_KEY) process.env.KOPIS_SERVICE_KEY = env.KOPIS_SERVICE_KEY
+      if (env.OPENAI_API_KEY) process.env.OPENAI_API_KEY = env.OPENAI_API_KEY
+      if (env.OPENAI_MODEL) process.env.OPENAI_MODEL = env.OPENAI_MODEL
       const { handleKopis, handleKopisImage } = await import('./api/_kopis.js')
       const { handleDashboard } = await import('./api/_dashboard.js')
+      const { handleAiCuration } = await import('./api/_ai-curation.js')
       const fs = await import('node:fs')
       const path = await import('node:path')
       server.middlewares.use('/api/dashboard', (req: any, res: any) => handleDashboard(req, res))
+      server.middlewares.use('/api/ai-curation', (req: any, res: any) => handleAiCuration(req, res))
       server.middlewares.use('/api/kopis-img', (req: any, res: any) => handleKopisImage(req, res))
       server.middlewares.use('/api/kopis', (req: any, res: any) => handleKopis(req, res))
       // 편집모드 저장: 핀 좌표를 venuePositions.json 에 기록 (개발서버 전용)

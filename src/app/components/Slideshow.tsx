@@ -7,14 +7,45 @@ import DashboardComponent from "../../imports/대시보드";
 import CurationComponent from "../../imports/추천";
 import { useDashboardData } from "../hooks/useDashboardData";
 import type { DashboardData } from "../lib/kopis";
-import { CURATION } from "../lib/curation";
+import { CURATION, type CurationContent } from "../lib/curation";
 
-// 추천 페이지 — 제목(source) + 콘텐츠(관리자 편집)만 다른 두 버전 (서울연극센터 / AI)
+// 추천 페이지 — 제목(source) + 콘텐츠만 다른 두 버전.
+// 서울연극센터: 관리자 편집(curation.json). AI: GPT가 오늘의 의미·절기·날씨로 추천(/api/ai-curation).
 function CurationSeoul(props: { data: DashboardData }) {
   return <CurationComponent {...props} source="서울연극센터" content={CURATION.seoul} />;
 }
+
+// AI 추천은 앱 로드당 1회만 호출하고 모듈 캐시로 재사용 (슬라이드 재마운트마다 재요청 방지)
+let aiCache: CurationContent | null = null;
+let aiPromise: Promise<CurationContent | null> | null = null;
+function loadAiCuration(): Promise<CurationContent | null> {
+  if (aiCache) return Promise.resolve(aiCache);
+  if (!aiPromise) {
+    aiPromise = fetch("/api/ai-curation")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("ai-curation " + r.status))))
+      .then((j: any) => {
+        if (j && Array.isArray(j.plays) && j.plays.length) {
+          aiCache = j as CurationContent;
+          return aiCache;
+        }
+        return null;
+      })
+      .catch(() => null);
+  }
+  return aiPromise;
+}
 function CurationAI(props: { data: DashboardData }) {
-  return <CurationComponent {...props} source="AI" content={CURATION.ai} />;
+  const [content, setContent] = useState<CurationContent>(CURATION.ai);
+  useEffect(() => {
+    let alive = true;
+    loadAiCuration().then((c) => {
+      if (alive && c) setContent(c);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return <CurationComponent {...props} source="AI" content={content} />;
 }
 
 const INTERVAL_MS = 10000; // 기본 전환 주기

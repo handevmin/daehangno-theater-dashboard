@@ -23,13 +23,13 @@ function isNearDaehakro(la, lo) {
 }
 
 // ----- 날짜 유틸 -----
-function fmt(d) {
+export function fmt(d) {
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
   return `${y}${m}${day}`
 }
-function addDays(d, n) {
+export function addDays(d, n) {
   const r = new Date(d)
   r.setDate(r.getDate() + n)
   return r
@@ -290,7 +290,7 @@ async function mapLimit(items, limit, fn) {
 
 // ----- 대학로 연극 풀 (boxoffice 서울·연극 → daehakro=Y) -----
 // 예매순위와 "곧 시작할 회차" 둘 다 이 풀에서 파생 (KOPIS 호출 절약)
-async function getDaehakroPool(stdate, eddate, maxDetail) {
+export async function getDaehakroPool(stdate, eddate, maxDetail) {
   const json = await fetchKopisJson('boxoffice', {
     ststype: 'week',
     stdate,
