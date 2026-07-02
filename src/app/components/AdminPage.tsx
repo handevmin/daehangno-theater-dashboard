@@ -122,7 +122,7 @@ export default function AdminPage() {
         body: JSON.stringify(store),
       });
       const j = await res.json().catch(() => ({}));
-      if (res.ok && j.ok) setMsg("저장됨 ✓ " + (j.note || ""));
+      if (res.ok && j.ok) setMsg("저장됨 ✓ 잠시 후 화면에 반영됩니다");
       else if (res.status === 401) setMsg("저장 실패(401): 편집 키가 없거나 틀립니다 — 주소를 /admin?key=◯◯◯ 형태로 접속하세요.");
       else setMsg(`저장 실패(${res.status}): ${j.error || "서버 오류"}`);
     } catch {
@@ -140,8 +140,7 @@ export default function AdminPage() {
         <h1 style={{ margin: "0 0 4px", fontSize: 24 }}>추천 페이지 관리자 (미리보기 편집)</h1>
         <p style={{ color: "#555", marginTop: 0, fontSize: 14, lineHeight: 1.5 }}>
           아래는 <b>실제 화면 그대로</b>입니다. 글자를 클릭해 바로 고치면 줄바꿈·줄 수가 즉시 반영됩니다.
-          공연 카드의 <b>🔍 KOPIS 검색</b>으로 공연을 고르면 포스터·공연장·기간·러닝타임·나이가 자동 입력됩니다.
-          다 고쳤으면 하단 <b>저장</b>을 누르면 GitHub 커밋 → 약 1분 뒤 모든 화면에 반영됩니다.
+          공연 카드의 <b>KOPIS 검색</b>으로 공연을 고르면 포스터·공연장·기간·러닝타임·나이가 자동 입력됩니다.
         </p>
         {!EDIT_KEY && (
           <p style={{ background: "#fff3cd", border: "1px solid #ffe08a", borderRadius: 6, padding: "8px 12px", fontSize: 13, color: "#8a6d00" }}>
@@ -219,15 +218,15 @@ export default function AdminPage() {
       )}
 
       {/* 저장 바 */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #ddd", padding: "12px 24px", display: "flex", alignItems: "center", gap: 14, zIndex: 100 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #ddd", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 14, zIndex: 100 }}>
+        <span style={{ fontSize: 14, color: msg.includes("실패") ? "#c00" : "#333" }}>{msg}</span>
         <button
           onClick={save}
           disabled={saving}
           style={{ fontSize: 16, padding: "10px 26px", background: "#121212", color: "#fff", border: "none", borderRadius: 8, cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1 }}
         >
-          저장 (GitHub 커밋)
+          저장
         </button>
-        <span style={{ fontSize: 14, color: msg.includes("실패") ? "#c00" : "#333" }}>{msg}</span>
       </div>
     </div>
   );

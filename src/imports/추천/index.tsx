@@ -105,7 +105,7 @@ function DPlayRow({ play, n, i, edit }: { play: CurationContent["plays"][number]
       </div>
       {edit && i != null ? (
         <div className="absolute right-0 top-[-6px] z-[20] flex gap-[6px]">
-          <button onClick={() => edit.onSearch(i)} className="bg-[#121212] text-white text-[13px] rounded-[6px] px-[10px] py-[4px]">🔍 KOPIS 검색</button>
+          <button onClick={() => edit.onSearch(i)} className="bg-[#121212] text-white text-[13px] rounded-[6px] px-[10px] py-[4px]">KOPIS 검색</button>
           <button onClick={() => edit.onRemovePlay(i)} className="bg-white border border-[#c00] text-[#c00] text-[13px] rounded-[6px] px-[10px] py-[4px]">삭제</button>
         </div>
       ) : null}
@@ -114,7 +114,7 @@ function DPlayRow({ play, n, i, edit }: { play: CurationContent["plays"][number]
           <div aria-hidden className="absolute border-[#121212] border-[2.4px] border-solid inset-[-2.4px] pointer-events-none" />
           <div className="bg-[#e3e2e0] h-[208px] overflow-hidden relative shrink-0 w-[156px]">
             {play.poster ? <img alt="" className="absolute inset-0 max-w-none object-cover size-full" src={proxyImg(play.poster)} /> : null}
-            {edit && i != null && !play.poster ? <button onClick={() => edit.onSearch(i)} className="absolute inset-0 flex items-center justify-center text-[#555] text-[14px]">🔍 검색</button> : null}
+            {edit && i != null && !play.poster ? <button onClick={() => edit.onSearch(i)} className="absolute inset-0 flex items-center justify-center text-[#555] text-[14px]">검색</button> : null}
           </div>
         </div>
         <div className="flex-[1_0_0] h-full min-w-px relative">
