@@ -70,10 +70,10 @@ function Frame() {
   );
 }
 
-function Wrap() {
+function Wrap({ source }: { source: string }) {
   return (
     <div className="[word-break:break-word] absolute content-stretch flex font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] gap-[6px] items-center leading-[normal] left-[36px] not-italic text-[34px] top-[25px] whitespace-nowrap" data-name="wrap">
-      <p className="relative shrink-0 text-[var(--accent)]">서울연극센터</p>
+      <p className="relative shrink-0 text-[var(--accent)]">{source}</p>
       <p className="relative shrink-0 text-white">가 추천하는 오늘의 공연</p>
     </div>
   );
@@ -122,10 +122,10 @@ function Group2() {
   );
 }
 
-function Frame3() {
+function Frame3({ source }: { source: string }) {
   return (
     <div className="absolute bg-[#121212] h-[103px] left-[159px] overflow-clip rounded-[12px] top-[24px] w-[1254px]">
-      <Wrap />
+      <Wrap source={source} />
       <ArrowUpRight />
       <Group2 />
     </div>
@@ -785,11 +785,11 @@ function Contents() {
   );
 }
 
-export default function Component(_props?: { data?: unknown }) {
+export default function Component({ source = "서울연극센터" }: { data?: unknown; source?: string } = {}) {
   return (
     <div className="bg-[#f7f8f9] relative size-full" data-name="연극1~5">
       <Frame />
-      <Frame3 />
+      <Frame3 source={source} />
       <Contents />
     </div>
   );

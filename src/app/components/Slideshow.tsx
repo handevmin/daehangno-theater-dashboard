@@ -6,6 +6,15 @@ import SmallTop5Component from "../../imports/소극장15";
 import DashboardComponent from "../../imports/대시보드";
 import CurationComponent from "../../imports/추천";
 import { useDashboardData } from "../hooks/useDashboardData";
+import type { DashboardData } from "../lib/kopis";
+
+// 추천 페이지 — 제목(source)만 다른 두 버전 (서울연극센터 / AI)
+function CurationSeoul(props: { data: DashboardData }) {
+  return <CurationComponent {...props} source="서울연극센터" />;
+}
+function CurationAI(props: { data: DashboardData }) {
+  return <CurationComponent {...props} source="AI" />;
+}
 
 const INTERVAL_MS = 10000; // 기본 전환 주기
 const FADE_MS = 1000; // 크로스페이드 시간
@@ -13,13 +22,13 @@ const FADE_MS = 1000; // 크로스페이드 시간
 const DESIGN_WIDTH = 1440;
 const DESIGN_HEIGHT = 1024;
 
-// 화면 순환 순서: 지도 → Top1-5 → Top6-10 → 소극장 Top1-5 → 대시보드 → 서울연극센터 추천 → (반복)
-const SLIDES = [MapComponent, Top5Component, Top610Component, SmallTop5Component, DashboardComponent, CurationComponent];
+// 화면 순환 순서: 지도 → Top1-5 → Top6-10 → 소극장 Top1-5 → 대시보드 → 서울연극센터 추천 → AI 추천 → (반복)
+const SLIDES = [MapComponent, Top5Component, Top610Component, SmallTop5Component, DashboardComponent, CurationSeoul, CurationAI];
 
 // 지도: 핀 6곳 × 2.8초 = 16.8초 (마지막 핀에서 멈춤).
 // 연극 TOP 1~5 / 6~10 / 소극장 Top1-5: 항목 5개 × 2.8초 = 14초 (마지막 항목에서 멈춤, TopPlaysScreen).
-// 대시보드/추천: 기본 10초.
-const SLIDE_DURATIONS = [16800, 14000, 14000, 14000, INTERVAL_MS, INTERVAL_MS];
+// 대시보드/추천(서울연극센터·AI): 기본 10초.
+const SLIDE_DURATIONS = [16800, 14000, 14000, 14000, INTERVAL_MS, INTERVAL_MS, INTERVAL_MS];
 
 // 캡쳐/디버그용: ?slide=N 이면 해당 슬라이드 고정. ?edit=1 이면 지도(0번) 고정.
 function lockedSlide(): number | null {
