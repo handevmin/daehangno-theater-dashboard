@@ -86,14 +86,14 @@
 .gcq-subtitle {
   margin-top: 12px;
   color: var(--ink);
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 500;
 }
 .gcq-cover {
   width: 100%;
   height: auto;
   border-radius: 14px;
-  margin: 34px 0 72px;
+  margin: 60px 0 72px;
   display: block;
 }
 .gcq-start .gcq-btn {
