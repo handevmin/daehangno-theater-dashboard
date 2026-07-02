@@ -120,9 +120,11 @@ function buildPrompt({ today, events, weather, candidates }) {
 }
 
 async function callOpenAI({ system, user }) {
-  const key = process.env.OPENAI_API_KEY
+  // 환경변수에 BOM(U+FEFF)/제로폭공백이 섞여도 헤더 오류(ByteString)가 안 나도록 정리
+  const clean = (s) => String(s || '').replace(/[﻿​ ]/g, '').trim()
+  const key = clean(process.env.OPENAI_API_KEY)
   if (!key) throw new Error('OPENAI_API_KEY 미설정')
-  const model = process.env.OPENAI_MODEL || 'gpt-4o'
+  const model = clean(process.env.OPENAI_MODEL) || 'gpt-4o'
   const r = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
