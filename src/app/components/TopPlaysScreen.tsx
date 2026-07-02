@@ -48,7 +48,10 @@ function Frame({ active = 2 }: { active?: number }) {
               <circle cx="56" cy={cy} r="9.5" stroke="white" strokeOpacity="0.2" strokeWidth="5" />
             </g>
           ))}
-          <path d={svgPaths.paaa8180} stroke="white" strokeDasharray="4 4" strokeOpacity="0.9" strokeWidth="3" />
+          {/* 점선 분기 — 활성 노드 위치로 이동 (노드 간격 88px). Top=2 기준 경로라 (active-2)*88 만큼 내림 */}
+          <g transform={`translate(0, ${(active - 2) * 88})`}>
+            <path d={svgPaths.paaa8180} stroke="white" strokeDasharray="4 4" strokeOpacity="0.9" strokeWidth="3" />
+          </g>
         </g>
         <defs>
           <clipPath id="clip_topplays"><rect fill="white" height="720" width="117" /></clipPath>

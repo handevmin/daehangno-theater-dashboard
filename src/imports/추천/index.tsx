@@ -102,7 +102,7 @@ function ArrowUpRight() {
 
 function Wrap1() {
   return (
-    <div className="-translate-x-1/2 [word-break:break-word] absolute content-stretch flex flex-col items-start left-[calc(50%+428px)] not-italic top-[27px] w-[140px]" data-name="wrap">
+    <div className="-translate-x-1/2 [word-break:break-word] absolute content-stretch flex flex-col items-start left-[calc(50%+468px)] not-italic top-[27px] w-[140px]" data-name="wrap">
       <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[24px] relative shrink-0 text-[var(--accent)] text-[13px] tracking-[0.52px] uppercase w-full whitespace-nowrap">Live Curating</p>
       <p className="font-['Elice_DigitalBaeum_OTF:Regular',sans-serif] leading-[normal] relative shrink-0 text-[16px] text-[rgba(255,255,255,0.6)] tracking-[-0.32px] w-full">실시간 추천</p>
     </div>
@@ -112,7 +112,7 @@ function Wrap1() {
 function Group2() {
   return (
     <div className="-translate-x-1/2 absolute contents left-[calc(50%+437px)] top-[27px]">
-      <div className="-translate-x-1/2 absolute left-[calc(50%+344px)] size-[8px] top-[36px]">
+      <div className="-translate-x-1/2 absolute left-[calc(50%+384px)] size-[8px] top-[36px]">
         <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 8">
           <circle cx="4" cy="4" fill="var(--fill-0, var(--accent))" id="Ellipse 65" r="4" />
         </svg>
