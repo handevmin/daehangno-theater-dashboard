@@ -7,13 +7,14 @@ import DashboardComponent from "../../imports/대시보드";
 import CurationComponent from "../../imports/추천";
 import { useDashboardData } from "../hooks/useDashboardData";
 import type { DashboardData } from "../lib/kopis";
+import { CURATION } from "../lib/curation";
 
-// 추천 페이지 — 제목(source)만 다른 두 버전 (서울연극센터 / AI)
+// 추천 페이지 — 제목(source) + 콘텐츠(관리자 편집)만 다른 두 버전 (서울연극센터 / AI)
 function CurationSeoul(props: { data: DashboardData }) {
-  return <CurationComponent {...props} source="서울연극센터" />;
+  return <CurationComponent {...props} source="서울연극센터" content={CURATION.seoul} />;
 }
 function CurationAI(props: { data: DashboardData }) {
-  return <CurationComponent {...props} source="AI" />;
+  return <CurationComponent {...props} source="AI" content={CURATION.ai} />;
 }
 
 const INTERVAL_MS = 10000; // 기본 전환 주기
