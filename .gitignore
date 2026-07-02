@@ -6,6 +6,7 @@ dist
 .gstack/
 
 # 대용량/참고용 — 앱 빌드에 불필요
+Implement feature/
 screenshots/
 그림1.png
 *.pdf
