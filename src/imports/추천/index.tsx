@@ -112,7 +112,7 @@ function Wrap1() {
 function Group2() {
   return (
     <div className="-translate-x-1/2 absolute contents left-[calc(50%+437px)] top-[27px]">
-      <div className="-translate-x-1/2 absolute left-[calc(50%+380px)] size-[8px] top-[36px]">
+      <div className="-translate-x-1/2 absolute left-[calc(50%+344px)] size-[8px] top-[36px]">
         <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 8">
           <circle cx="4" cy="4" fill="var(--fill-0, var(--accent))" id="Ellipse 65" r="4" />
         </svg>

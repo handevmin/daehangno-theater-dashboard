@@ -43,7 +43,10 @@ function Frame({ active = 2 }: { active?: number }) {
             <circle cx="-25" cy="644" fill="#C2FFAA" r="12" />
           </g>
           {NODE_Y.map((cy, i) => (
-            <circle key={cy} cx="56" cy={cy} fill={i + 1 === active ? "var(--accent)" : "#4D4D4D"} r="12" />
+            <g key={cy}>
+              <circle cx="56" cy={cy} fill={i + 1 === active ? "var(--accent)" : "#4D4D4D"} r="12" />
+              <circle cx="56" cy={cy} r="9.5" stroke="white" strokeOpacity="0.2" strokeWidth="5" />
+            </g>
           ))}
           <path d={svgPaths.paaa8180} stroke="white" strokeDasharray="4 4" strokeOpacity="0.9" strokeWidth="3" />
         </g>

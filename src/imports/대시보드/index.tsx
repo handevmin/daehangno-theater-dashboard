@@ -24,10 +24,15 @@ function Frame() {
             <circle cx="-25" cy="644" fill="#C2FFAA" r="12" />
           </g>
           <circle cx="56" cy="175" fill="#4D4D4D" r="12" />
+          <circle cx="56" cy="175" r="9.5" stroke="white" strokeOpacity="0.2" strokeWidth="5" />
           <circle cx="56" cy="439" fill="var(--accent)" r="12" />
+          <circle cx="56" cy="439" r="9.5" stroke="white" strokeOpacity="0.2" strokeWidth="5" />
           <circle cx="56" cy="351" fill="#4D4D4D" r="12" />
+          <circle cx="56" cy="351" r="9.5" stroke="white" strokeOpacity="0.2" strokeWidth="5" />
           <circle cx="56" cy="263" fill="#4D4D4D" r="12" />
+          <circle cx="56" cy="263" r="9.5" stroke="white" strokeOpacity="0.2" strokeWidth="5" />
           <circle cx="56" cy="527" fill="#4D4D4D" r="12" />
+          <circle cx="56" cy="527" r="9.5" stroke="white" strokeOpacity="0.2" strokeWidth="5" />
           <path d={svgPaths.p38d36000} id="Vector 1" stroke="var(--stroke-0, white)" strokeDasharray="4 4" strokeOpacity="0.9" strokeWidth="3" />
         </g>
         <defs>
