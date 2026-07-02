@@ -1,0 +1,396 @@
+/* 극캐감별사 전용 스타일 — 스모어 원본 디자인을 그대로 재현.
+ * 모든 규칙은 .gcq 하위로 스코프해 대시보드 전역 스타일과 충돌하지 않게 한다. */
+
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
+
+.gcq {
+  --gold: #efba12;
+  --gold-top: #f6c92f;
+  --gold-bottom: #ecb200;
+  --ink: #3b3b3b;
+  --muted: #8a8a8a;
+  --track: #e9e9e9;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  background: #ffffff;
+  color: var(--ink);
+  font-family: "Pretendard Variable", Pretendard, "SUIT:Bold", -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 모바일 세로형 고정 폭 프레임 */
+.gcq-frame {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ── 공용 골드 버튼 ─────────────────────────────── */
+.gcq-btn {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  min-height: 60px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--gold-top), var(--gold-bottom));
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 12px 22px -8px rgba(239, 186, 18, 0.65);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+.gcq-btn:hover {
+  filter: brightness(1.02);
+}
+.gcq-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 6px 14px -8px rgba(239, 186, 18, 0.65);
+}
+.gcq-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ══════════ 시작 화면 ══════════ */
+.gcq-start {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 28px 56px;
+  gap: 0;
+}
+.gcq-title {
+  color: var(--gold);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.gcq-subtitle {
+  margin-top: 12px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+.gcq-cover {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  margin: 34px 0 40px;
+  display: block;
+}
+.gcq-start .gcq-btn {
+  max-width: 380px;
+}
+
+/* ══════════ 문항 화면 ══════════ */
+.gcq-quiz {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 26px 40px;
+}
+.gcq-progress {
+  margin-bottom: 8px;
+}
+.gcq-count {
+  text-align: right;
+  font-size: 13px;
+  color: #b8b8b8;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.gcq-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.gcq-back {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--gold-top), var(--gold-bottom));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 12px -5px rgba(239, 186, 18, 0.7);
+}
+.gcq-back svg {
+  width: 16px;
+  height: 16px;
+}
+.gcq-back:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.gcq-track {
+  flex: 1;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+.gcq-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold-top), var(--gold));
+  transition: width 0.35s ease;
+}
+
+.gcq-qnum {
+  text-align: center;
+  color: var(--gold);
+  font-size: 34px;
+  font-weight: 800;
+  margin-top: 44px;
+}
+.gcq-qtext {
+  text-align: center;
+  color: var(--ink);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 22px;
+  white-space: pre-line;
+  min-height: 44px;
+}
+.gcq-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 40px;
+}
+.gcq-option {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--gold-top), var(--gold-bottom));
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: center;
+  white-space: pre-line;
+  box-shadow: 0 12px 20px -10px rgba(239, 186, 18, 0.6);
+  transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+}
+.gcq-option:hover {
+  filter: brightness(1.03);
+}
+.gcq-option:active {
+  transform: translateY(1px) scale(0.995);
+}
+
+/* 문항 전환 페이드 */
+.gcq-fade {
+  animation: gcqFade 0.32s ease;
+}
+@keyframes gcqFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ══════════ 로딩 화면 ══════════ */
+.gcq-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: 40px;
+}
+.gcq-spinner {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 5px solid var(--track);
+  border-top-color: var(--gold);
+  animation: gcqSpin 0.9s linear infinite;
+}
+@keyframes gcqSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.gcq-loading-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.gcq-loading-dots::after {
+  content: "";
+  animation: gcqDots 1.4s steps(4, end) infinite;
+}
+@keyframes gcqDots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+}
+
+/* ══════════ 결과 화면 ══════════ */
+.gcq-result {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+}
+.gcq-banner {
+  width: 100%;
+  background: var(--gold);
+  line-height: 0;
+}
+.gcq-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.gcq-card {
+  position: relative;
+  margin: -30px 16px 0;
+  background: #fff;
+  border-radius: 30px;
+  padding: 40px 26px 34px;
+  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.04);
+}
+.gcq-r-toptitle {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: #4a4a4a;
+}
+.gcq-r-name {
+  text-align: center;
+  font-size: 27px;
+  font-weight: 800;
+  color: var(--gold);
+  margin-top: 8px;
+}
+.gcq-divider {
+  width: 34px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--gold);
+  opacity: 0.55;
+  margin: 22px auto;
+}
+.gcq-quote {
+  text-align: center;
+  font-style: italic;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: #2f2f2f;
+}
+.gcq-source {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.gcq-desc {
+  margin-top: 6px;
+}
+.gcq-desc p {
+  text-align: justify;
+  font-size: 14.5px;
+  line-height: 2;
+  color: #4a4a4a;
+  font-weight: 500;
+}
+.gcq-desc p + p {
+  margin-top: 20px;
+}
+
+/* 케미 */
+.gcq-chem {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 34px;
+}
+.gcq-chem-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.gcq-chem-label {
+  border: 1.5px solid #e6e6e6;
+  border-radius: 999px;
+  padding: 9px 0;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.gcq-chem-img {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f4f4f4;
+}
+.gcq-chem-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.gcq-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 30px 26px 46px;
+}
+
+/* 작은 화면 대응 */
+@media (max-width: 360px) {
+  .gcq-qnum {
+    font-size: 30px;
+  }
+  .gcq-r-name {
+    font-size: 24px;
+  }
+}
