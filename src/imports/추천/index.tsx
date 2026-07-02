@@ -172,9 +172,6 @@ function DContents({ content, edit }: { content: CurationContent; edit?: Curatio
             <DPlayRow play={p} n={i + 1} i={i} edit={edit} />
           </Fragment>
         ))}
-        {edit ? (
-          <button onClick={edit.onAddPlay} className="w-[759px] border border-dashed border-[#999] rounded-[8px] py-[12px] text-[#666] text-[16px] bg-white/60">+ 공연 추가</button>
-        ) : null}
       </div>
     </div>
   );

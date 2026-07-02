@@ -165,11 +165,12 @@ export default function AdminPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#eef0f2", fontFamily: "'SUIT', sans-serif", paddingBottom: 90 }}>
       <div style={{ maxWidth: 1500, margin: "0 auto", padding: "20px 24px 0" }}>
-        <h1 style={{ margin: "0 0 4px", fontSize: 24 }}>추천 페이지 관리자 (미리보기 편집)</h1>
+        <h1 style={{ margin: "0 0 4px", fontSize: 24 }}>추천 페이지 관리자</h1>
         <p style={{ color: "#555", marginTop: 0, fontSize: 14, lineHeight: 1.5 }}>
-          아래는 <b>실제 화면 그대로</b>입니다. 글자를 클릭해 바로 고치면 줄바꿈·줄 수가 즉시 반영됩니다.
+          글자를 클릭해 바로 고치면 줄바꿈·줄 수가 즉시 반영됩니다.
           공연 카드의 <b>KOPIS 검색</b>으로 공연을 고르면 포스터·공연장·기간·러닝타임·나이가 자동 입력됩니다.
-          AI 페이지는 <b>✨ AI 자동 생성</b>으로 오늘의 추천을 불러온 뒤 확인·수정해 저장할 수 있습니다.
+          AI 페이지는 <b>✨ AI 자동 생성</b>으로 오늘의 추천을 불러온 뒤 확인·수정할 수 있습니다.
+          <b> 저장하면 화면에 반영됩니다.</b>
         </p>
       </div>
 
