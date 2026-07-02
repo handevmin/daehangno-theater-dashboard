@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import CurationComponent, { type CurationEdit } from "../../imports/추천";
 import { CURATION, emptyPlay, type CurationStore, type CurationContent, type CurationPlay } from "../lib/curation";
 
 const EDIT_KEY = (() => {
@@ -37,35 +38,69 @@ function ageToKorean(prfage: string): string {
   return m ? String(Number(m[1]) + 1) : "";
 }
 
-const inputStyle: React.CSSProperties = { padding: "6px 8px", border: "1px solid #ccc", borderRadius: 6, fontSize: 14 };
-const labelStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 3, fontSize: 13, color: "#444" };
+const PAGES = [
+  { key: "seoul" as const, source: "서울연극센터" },
+  { key: "ai" as const, source: "AI" },
+];
 
-function PlayEditor({ play, onChange, onRemove, n }: { play: CurationPlay; onChange: (p: CurationPlay) => void; onRemove: () => void; n: number }) {
-  const [q, setQ] = useState(play.title);
+type SearchTarget = { page: "seoul" | "ai"; index: number };
+
+export default function AdminPage() {
+  const [store, setStore] = useState<CurationStore>(() => JSON.parse(JSON.stringify(CURATION)));
+  const [msg, setMsg] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [target, setTarget] = useState<SearchTarget | null>(null);
+  const [q, setQ] = useState("");
   const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const set = (k: keyof CurationPlay, v: string) => onChange({ ...play, [k]: v });
-  const search = async () => {
+  const [searching, setSearching] = useState(false);
+
+  useEffect(() => {
+    const update = () => setScale(Math.min(1, (window.innerWidth - 48) / 1440));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const patchContent = (page: "seoul" | "ai", patch: Partial<CurationContent>) =>
+    setStore((s) => ({ ...s, [page]: { ...s[page], ...patch } }));
+  const patchPlay = (page: "seoul" | "ai", i: number, patch: Partial<CurationPlay>) =>
+    setStore((s) => ({ ...s, [page]: { ...s[page], plays: s[page].plays.map((p, j) => (j === i ? { ...p, ...patch } : p)) } }));
+
+  const editFor = (page: "seoul" | "ai"): CurationEdit => ({
+    onField: (k, v) => patchContent(page, { [k]: v }),
+    onTags: (tags) => patchContent(page, { tags }),
+    onPlay: (i, patch) => patchPlay(page, i, patch),
+    onSearch: (i) => {
+      setTarget({ page, index: i });
+      setQ(store[page].plays[i]?.title || "");
+      setResults([]);
+    },
+    onAddPlay: () => setStore((s) => ({ ...s, [page]: { ...s[page], plays: [...s[page].plays, emptyPlay()] } })),
+    onRemovePlay: (i) => setStore((s) => ({ ...s, [page]: { ...s[page], plays: s[page].plays.filter((_, j) => j !== i) } })),
+  });
+
+  const doSearch = async () => {
     if (!q.trim()) return;
-    setLoading(true);
+    setSearching(true);
     try {
       setResults(await kopisSearch(q.trim()));
     } catch {
       setResults([]);
     } finally {
-      setLoading(false);
+      setSearching(false);
     }
   };
   const pick = async (r: any) => {
+    if (!target) return;
     let d: any = null;
     try {
       d = await kopisDetail(r.mt20id);
     } catch {
       /* ignore */
     }
-    onChange({
-      ...play,
-      title: r.prfnm || d?.prfnm || play.title,
+    patchPlay(target.page, target.index, {
+      title: r.prfnm || d?.prfnm || "",
       venue: d?.fcltynm || r.fcltynm || "",
       from: d?.prfpdfrom || r.prfpdfrom || "",
       to: d?.prfpdto || r.prfpdto || "",
@@ -73,64 +108,12 @@ function PlayEditor({ play, onChange, onRemove, n }: { play: CurationPlay; onCha
       age: ageToKorean(d?.prfage || ""),
       poster: r.poster || d?.poster || "",
     });
+    setTarget(null);
     setResults([]);
   };
-  return (
-    <div style={{ border: "1px solid #d8d8d8", borderRadius: 10, padding: 14, marginBottom: 12, background: "#fafafa" }}>
-      <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "center" }}>
-        <b style={{ width: 24 }}>{n}</b>
-        <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === "Enter" && search()} placeholder="공연명으로 KOPIS 검색" style={{ ...inputStyle, flex: 1 }} />
-        <button onClick={search} disabled={loading}>{loading ? "검색중…" : "KOPIS 검색"}</button>
-        <button onClick={onRemove} style={{ color: "#c00" }}>삭제</button>
-      </div>
-      {results.length > 0 && (
-        <div style={{ maxHeight: 180, overflow: "auto", border: "1px solid #e0e0e0", borderRadius: 6, marginBottom: 8, background: "#fff" }}>
-          {results.map((r, i) => (
-            <div key={i} onClick={() => pick(r)} style={{ padding: "6px 10px", cursor: "pointer", borderBottom: "1px solid #f0f0f0", fontSize: 13 }}>
-              <b>{r.prfnm}</b> · {r.fcltynm} · {r.prfpdfrom}~{r.prfpdto} <span style={{ color: "#999" }}>[{r.genrenm}]</span>
-            </div>
-          ))}
-        </div>
-      )}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-        <label style={labelStyle}>제목<input style={inputStyle} value={play.title} onChange={(e) => set("title", e.target.value)} /></label>
-        <label style={labelStyle}>공연장<input style={inputStyle} value={play.venue} onChange={(e) => set("venue", e.target.value)} /></label>
-        <label style={labelStyle}>시작일(YYYY.MM.DD)<input style={inputStyle} value={play.from} onChange={(e) => set("from", e.target.value)} /></label>
-        <label style={labelStyle}>종료일(YYYY.MM.DD)<input style={inputStyle} value={play.to} onChange={(e) => set("to", e.target.value)} /></label>
-        <label style={labelStyle}>러닝타임<input style={inputStyle} value={play.runtime} onChange={(e) => set("runtime", e.target.value)} /></label>
-        <label style={labelStyle}>관람연령(세는나이)<input style={inputStyle} value={play.age} onChange={(e) => set("age", e.target.value)} /></label>
-        <label style={{ ...labelStyle, gridColumn: "1 / 3" }}>포스터 URL<input style={inputStyle} value={play.poster} onChange={(e) => set("poster", e.target.value)} /></label>
-        <label style={{ ...labelStyle, gridColumn: "1 / 3" }}>추천 문구<input style={inputStyle} value={play.quote} onChange={(e) => set("quote", e.target.value)} /></label>
-      </div>
-    </div>
-  );
-}
 
-function PageEditor({ label, content, onChange }: { label: string; content: CurationContent; onChange: (c: CurationContent) => void }) {
-  const set = (k: keyof CurationContent, v: any) => onChange({ ...content, [k]: v });
-  return (
-    <section style={{ marginBottom: 36, borderTop: "3px solid #121212", paddingTop: 14 }}>
-      <h2 style={{ margin: "0 0 12px" }}>{label}</h2>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
-        <label style={labelStyle}>분위기 해시태그(예: 유쾌한 하루)<input style={inputStyle} value={content.hashtag} onChange={(e) => set("hashtag", e.target.value)} /></label>
-        <label style={labelStyle}>분위기 제목<input style={inputStyle} value={content.moodTitle} onChange={(e) => set("moodTitle", e.target.value)} /></label>
-        <label style={{ ...labelStyle, gridColumn: "1 / 3" }}>설명<textarea style={{ ...inputStyle, resize: "vertical" }} rows={3} value={content.moodDesc} onChange={(e) => set("moodDesc", e.target.value)} /></label>
-        <label style={labelStyle}>분위기 버튼(예: 개그 · 코미디)<input style={inputStyle} value={content.vibe} onChange={(e) => set("vibe", e.target.value)} /></label>
-        <label style={labelStyle}>태그(쉼표 구분, # 제외)<input style={inputStyle} value={content.tags.join(", ")} onChange={(e) => set("tags", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))} /></label>
-      </div>
-      <h3 style={{ margin: "10px 0 8px" }}>공연 목록</h3>
-      {content.plays.map((p, i) => (
-        <PlayEditor key={i} n={i + 1} play={p} onChange={(np) => set("plays", content.plays.map((x, j) => (j === i ? np : x)))} onRemove={() => set("plays", content.plays.filter((_, j) => j !== i))} />
-      ))}
-      <button onClick={() => set("plays", [...content.plays, emptyPlay()])}>+ 공연 추가</button>
-    </section>
-  );
-}
-
-export default function AdminPage() {
-  const [store, setStore] = useState<CurationStore>(() => JSON.parse(JSON.stringify(CURATION)));
-  const [msg, setMsg] = useState("");
   const save = async () => {
+    setSaving(true);
     setMsg("저장 중…");
     try {
       const res = await fetch("/api/save-curation" + (EDIT_KEY ? `?key=${encodeURIComponent(EDIT_KEY)}` : ""), {
@@ -140,23 +123,111 @@ export default function AdminPage() {
       });
       const j = await res.json().catch(() => ({}));
       if (res.ok && j.ok) setMsg("저장됨 ✓ " + (j.note || ""));
-      else if (res.status === 401) setMsg("저장 실패(401): 편집 키가 없거나 틀립니다 — 주소에 ?admin=1&key=◯◯◯ 형태로 접속하세요.");
+      else if (res.status === 401) setMsg("저장 실패(401): 편집 키가 없거나 틀립니다 — 주소를 /admin?key=◯◯◯ 형태로 접속하세요.");
       else setMsg(`저장 실패(${res.status}): ${j.error || "서버 오류"}`);
     } catch {
       setMsg("저장 실패: 네트워크 오류");
+    } finally {
+      setSaving(false);
     }
   };
+
+  const pageHeight = (c: CurationContent) => Math.max(780, 360 + c.plays.length * 250);
+
   return (
-    <div style={{ maxWidth: 920, margin: "0 auto", padding: 24, fontFamily: "'SUIT', sans-serif" }}>
-      <h1 style={{ marginBottom: 6 }}>추천 페이지 관리자</h1>
-      <p style={{ color: "#666", marginTop: 0, fontSize: 14 }}>
-        공연은 <b>KOPIS 검색</b>으로 선택하면 포스터·공연장·기간·러닝타임·나이가 자동 입력됩니다. 분위기·문구는 직접 입력하세요. <b>저장</b>하면 GitHub 커밋 → 약 1분 뒤 모든 화면에 반영됩니다.
-      </p>
-      <PageEditor label="서울연극센터가 추천하는 오늘의 공연" content={store.seoul} onChange={(c) => setStore({ ...store, seoul: c })} />
-      <PageEditor label="AI가 추천하는 오늘의 공연" content={store.ai} onChange={(c) => setStore({ ...store, ai: c })} />
-      <div style={{ position: "sticky", bottom: 0, background: "#fff", padding: "12px 0", borderTop: "1px solid #ddd", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={save} style={{ fontSize: 16, padding: "10px 24px", background: "#121212", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer" }}>저장 (GitHub 커밋)</button>
-        <span style={{ fontSize: 14 }}>{msg}</span>
+    <div style={{ minHeight: "100vh", background: "#eef0f2", fontFamily: "'SUIT', sans-serif", paddingBottom: 90 }}>
+      <div style={{ maxWidth: 1500, margin: "0 auto", padding: "20px 24px 0" }}>
+        <h1 style={{ margin: "0 0 4px", fontSize: 24 }}>추천 페이지 관리자 (미리보기 편집)</h1>
+        <p style={{ color: "#555", marginTop: 0, fontSize: 14, lineHeight: 1.5 }}>
+          아래는 <b>실제 화면 그대로</b>입니다. 글자를 클릭해 바로 고치면 줄바꿈·줄 수가 즉시 반영됩니다.
+          공연 카드의 <b>🔍 KOPIS 검색</b>으로 공연을 고르면 포스터·공연장·기간·러닝타임·나이가 자동 입력됩니다.
+          다 고쳤으면 하단 <b>저장</b>을 누르면 GitHub 커밋 → 약 1분 뒤 모든 화면에 반영됩니다.
+        </p>
+        {!EDIT_KEY && (
+          <p style={{ background: "#fff3cd", border: "1px solid #ffe08a", borderRadius: 6, padding: "8px 12px", fontSize: 13, color: "#8a6d00" }}>
+            ⚠ 저장하려면 편집 키가 필요합니다. <b>/admin?key=◯◯◯</b> 형태로 접속하세요.
+          </p>
+        )}
+      </div>
+
+      {PAGES.map(({ key, source }) => (
+        <div key={key} style={{ maxWidth: 1500, margin: "0 auto", padding: "8px 24px 28px" }}>
+          <div style={{ fontWeight: 700, fontSize: 16, margin: "10px 0 8px" }}>{source}가 추천하는 오늘의 공연</div>
+          <div
+            style={{
+              width: 1440 * scale,
+              height: pageHeight(store[key]) * scale,
+              overflow: "hidden",
+              border: "1px solid #d5d8dc",
+              borderRadius: 10,
+              boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+            }}
+          >
+            <div style={{ width: 1440, height: pageHeight(store[key]), transform: `scale(${scale})`, transformOrigin: "top left", position: "relative" }}>
+              <CurationComponent source={source} content={store[key]} edit={editFor(key)} />
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* KOPIS 검색 모달 */}
+      {target && (
+        <div
+          onClick={() => setTarget(null)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}
+        >
+          <div onClick={(e) => e.stopPropagation()} style={{ background: "#fff", borderRadius: 12, padding: 20, width: 600, maxHeight: "82vh", overflow: "auto" }}>
+            <h3 style={{ margin: "0 0 10px" }}>KOPIS 공연 검색</h3>
+            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              <input
+                autoFocus
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && doSearch()}
+                placeholder="공연명으로 검색 후 선택"
+                style={{ flex: 1, padding: "8px 10px", border: "1px solid #ccc", borderRadius: 6, fontSize: 14 }}
+              />
+              <button onClick={doSearch} disabled={searching} style={{ padding: "8px 16px", borderRadius: 6, border: "none", background: "#121212", color: "#fff", cursor: "pointer" }}>
+                {searching ? "검색중…" : "검색"}
+              </button>
+            </div>
+            {results.length === 0 && !searching && <p style={{ color: "#999", fontSize: 13 }}>검색 결과가 여기에 표시됩니다.</p>}
+            <div>
+              {results.map((r, i) => (
+                <div
+                  key={i}
+                  onClick={() => pick(r)}
+                  style={{ display: "flex", gap: 10, padding: "8px 6px", cursor: "pointer", borderBottom: "1px solid #f0f0f0", alignItems: "center" }}
+                >
+                  {r.poster ? <img alt="" src={r.poster} style={{ width: 34, height: 48, objectFit: "cover", borderRadius: 3, flexShrink: 0 }} /> : null}
+                  <div style={{ fontSize: 13 }}>
+                    <b>{r.prfnm}</b>
+                    <div style={{ color: "#888" }}>
+                      {r.fcltynm} · {r.prfpdfrom}~{r.prfpdto} · {r.genrenm}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 12, textAlign: "right" }}>
+              <button onClick={() => setTarget(null)} style={{ padding: "6px 14px", borderRadius: 6, border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 저장 바 */}
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #ddd", padding: "12px 24px", display: "flex", alignItems: "center", gap: 14, zIndex: 100 }}>
+        <button
+          onClick={save}
+          disabled={saving}
+          style={{ fontSize: 16, padding: "10px 26px", background: "#121212", color: "#fff", border: "none", borderRadius: 8, cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1 }}
+        >
+          저장 (GitHub 커밋)
+        </button>
+        <span style={{ fontSize: 14, color: msg.includes("실패") ? "#c00" : "#333" }}>{msg}</span>
       </div>
     </div>
   );

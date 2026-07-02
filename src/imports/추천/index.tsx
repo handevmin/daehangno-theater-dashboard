@@ -1,15 +1,44 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import svgPaths from "./svg-sp9cg5efrd";
 import imgImage48 from "./6702290366fe491b3b436f829f55bfe1f4fe056f.png";
 import { proxyImg } from "../../app/lib/kopis";
-import type { CurationContent } from "../../app/lib/curation";
+import type { CurationContent, CurationPlay } from "../../app/lib/curation";
 import { CURATION } from "../../app/lib/curation";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 void imgImage48; // 아래 원본(하드코딩) 컴포넌트 호환용 — 실제 렌더는 데이터 기반 컴포넌트 사용
 
+// 관리자 WYSIWYG 편집 핸들러
+export interface CurationEdit {
+  onField: (k: keyof CurationContent, v: string) => void;
+  onTags: (tags: string[]) => void;
+  onPlay: (i: number, patch: Partial<CurationPlay>) => void;
+  onSearch: (i: number) => void;
+  onAddPlay: () => void;
+  onRemovePlay: (i: number) => void;
+}
+
+// 실제 렌더 스타일 그대로 두고 contentEditable로 인라인 편집 (blur 시 커밋 → 커서 안 튐)
+function Editable({ value, onCommit, className, style }: { value: string; onCommit: (v: string) => void; className?: string; style?: React.CSSProperties }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (ref.current && ref.current.innerText !== value) ref.current.innerText = value;
+  }, [value]);
+  return (
+    <span
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      spellCheck={false}
+      className={className}
+      style={{ outline: "none", cursor: "text", display: "inline-block", minWidth: 10, ...style }}
+      onBlur={(e) => onCommit(e.currentTarget.innerText.replace(/ /g, " "))}
+    />
+  );
+}
+
 // ===== 데이터 기반 추천 콘텐츠 컴포넌트 =====
-function DMoodCard({ c }: { c: CurationContent }) {
+function DMoodCard({ c, edit }: { c: CurationContent; edit?: CurationEdit }) {
   return (
     <div className="bg-[var(--accent)] content-stretch flex flex-col h-[367px] items-center justify-between py-[6px] relative rounded-[12px] shrink-0 w-full">
       <div aria-hidden className="absolute border-[2.5px] border-black border-solid inset-0 pointer-events-none rounded-[12px]" />
@@ -17,15 +46,15 @@ function DMoodCard({ c }: { c: CurationContent }) {
         <div className="flex items-center px-[20px] py-[14px] w-full">
           <div className="bg-white content-stretch flex items-center justify-center px-[16px] py-[4px] relative rounded-[999px] shrink-0">
             <div aria-hidden className="absolute border-2 border-[#121212] border-solid inset-0 pointer-events-none rounded-[999px]" />
-            <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] text-[#121212] text-[16px] whitespace-nowrap">#{c.hashtag}</p>
+            <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] text-[#121212] text-[16px] whitespace-nowrap">#{edit ? <Editable value={c.hashtag} onCommit={(v) => edit.onField("hashtag", v)} /> : c.hashtag}</p>
           </div>
         </div>
         <div className="flex items-center px-[22px] w-full">
-          <p className="flex-[1_0_0] font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] max-h-[46px] min-w-px overflow-hidden text-[#121212] text-[32px] text-ellipsis tracking-[1.28px]">{c.moodTitle}</p>
+          <p className="flex-[1_0_0] font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] max-h-[46px] min-w-px overflow-hidden text-[#121212] text-[32px] text-ellipsis tracking-[1.28px]">{edit ? <Editable value={c.moodTitle} onCommit={(v) => edit.onField("moodTitle", v)} /> : c.moodTitle}</p>
         </div>
         <div className="h-[171px] w-full">
           <div className="flex items-center justify-center px-[22px] py-[18px] size-full">
-            <p className="flex-[1_0_0] font-['SUIT:SemiBold',sans-serif] h-[97px] leading-[1.5] min-w-px overflow-hidden text-[#121212] text-[18px] text-ellipsis tracking-[-0.36px] whitespace-pre-wrap">{c.moodDesc}</p>
+            <p className="flex-[1_0_0] font-['SUIT:SemiBold',sans-serif] h-[97px] leading-[1.5] min-w-px overflow-hidden text-[#121212] text-[18px] text-ellipsis tracking-[-0.36px] whitespace-pre-wrap">{edit ? <Editable value={c.moodDesc} onCommit={(v) => edit.onField("moodDesc", v)} style={{ display: "block", whiteSpace: "pre-wrap" }} /> : c.moodDesc}</p>
           </div>
         </div>
       </div>
@@ -40,7 +69,7 @@ function DMoodCard({ c }: { c: CurationContent }) {
           </div>
           <div className="bg-[#121212] content-stretch flex items-center justify-center p-[10px] relative rounded-[999px] shrink-0 min-w-[140px]">
             <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[999px]" />
-            <p className="font-['SUIT:ExtraBold',sans-serif] text-[14px] text-white tracking-[0.14px] whitespace-nowrap">{c.vibe}</p>
+            <p className="font-['SUIT:ExtraBold',sans-serif] text-[14px] text-white tracking-[0.14px] whitespace-nowrap">{edit ? <Editable value={c.vibe} onCommit={(v) => edit.onField("vibe", v)} /> : c.vibe}</p>
           </div>
         </div>
       </div>
@@ -48,62 +77,75 @@ function DMoodCard({ c }: { c: CurationContent }) {
   );
 }
 
-function DTags({ tags }: { tags: string[] }) {
+function DTags({ tags, edit }: { tags: string[]; edit?: CurationEdit }) {
+  const setTag = (i: number, v: string) => edit?.onTags(tags.map((x, j) => (j === i ? v : x)).filter((x) => x.trim() !== ""));
   return (
     <div className="content-center flex flex-wrap gap-[9px] items-center py-[16px] relative shrink-0 w-full">
       {tags.map((t, i) => (
         <div key={i} className="bg-[#fafafa] content-stretch flex items-center justify-center px-[12px] py-[4px] relative rounded-[999px] shrink-0">
           <div aria-hidden className="absolute border border-[#121212] border-solid inset-0 pointer-events-none rounded-[999px]" />
-          <p className="font-['SUIT:SemiBold',sans-serif] text-[#121212] text-[16px] whitespace-nowrap">#{t}</p>
+          <p className="font-['SUIT:SemiBold',sans-serif] text-[#121212] text-[16px] whitespace-nowrap">#{edit ? <Editable value={t} onCommit={(v) => setTag(i, v)} /> : t}</p>
+          {edit ? <button onClick={() => edit.onTags(tags.filter((_, j) => j !== i))} className="ml-[4px] text-[#c00] text-[14px] leading-none" title="태그 삭제">×</button> : null}
         </div>
       ))}
+      {edit ? (
+        <button onClick={() => edit.onTags([...tags, "새 태그"])} className="bg-white content-stretch flex items-center justify-center px-[12px] py-[4px] rounded-[999px] border border-dashed border-[#999] text-[#666] text-[15px]" title="태그 추가">+ 태그</button>
+      ) : null}
     </div>
   );
 }
 
-function DPlayRow({ play, n }: { play: CurationContent["plays"][number]; n: number }) {
+function DPlayRow({ play, n, i, edit }: { play: CurationContent["plays"][number]; n: number; i?: number; edit?: CurationEdit }) {
+  const setP = (k: keyof CurationPlay, v: string) => edit && i != null && edit.onPlay(i, { [k]: v });
   return (
     <div className="relative shrink-0 w-[759px]">
       <div className="absolute left-[-34px] size-[53.922px] top-[-9px] z-[10]">
         <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 53.1024 52.2956"><path d={svgPaths.p2066ca72} fill="var(--accent)" stroke="black" strokeWidth="1.61765" /></svg>
         <p className="-translate-x-1/2 absolute font-['SUIT:ExtraBold',sans-serif] left-1/2 text-[#121212] text-[15px] text-center top-[calc(50%-9px)] whitespace-nowrap">{n}</p>
       </div>
+      {edit && i != null ? (
+        <div className="absolute right-0 top-[-6px] z-[20] flex gap-[6px]">
+          <button onClick={() => edit.onSearch(i)} className="bg-[#121212] text-white text-[13px] rounded-[6px] px-[10px] py-[4px]">🔍 KOPIS 검색</button>
+          <button onClick={() => edit.onRemovePlay(i)} className="bg-white border border-[#c00] text-[#c00] text-[13px] rounded-[6px] px-[10px] py-[4px]">삭제</button>
+        </div>
+      ) : null}
       <div className="content-stretch flex gap-[24px] h-[212px] items-center w-full">
         <div className="content-stretch flex items-center relative shrink-0">
           <div aria-hidden className="absolute border-[#121212] border-[2.4px] border-solid inset-[-2.4px] pointer-events-none" />
           <div className="bg-[#e3e2e0] h-[208px] overflow-hidden relative shrink-0 w-[156px]">
             {play.poster ? <img alt="" className="absolute inset-0 max-w-none object-cover size-full" src={proxyImg(play.poster)} /> : null}
+            {edit && i != null && !play.poster ? <button onClick={() => edit.onSearch(i)} className="absolute inset-0 flex items-center justify-center text-[#555] text-[14px]">🔍 검색</button> : null}
           </div>
         </div>
         <div className="flex-[1_0_0] h-full min-w-px relative">
           <div className="content-stretch flex flex-col items-start justify-between py-[8px] size-full">
             <div className="flex h-[35px] items-center w-full">
-              <p className="flex-[1_0_0] font-['Elice_DX_Neolli_OTF:Medium',sans-serif] h-full leading-[1.25] min-w-px overflow-hidden text-[#121212] text-[28px] text-ellipsis whitespace-nowrap">{play.title}</p>
+              <p className="flex-[1_0_0] font-['Elice_DX_Neolli_OTF:Medium',sans-serif] h-full leading-[1.25] min-w-px overflow-hidden text-[#121212] text-[28px] text-ellipsis whitespace-nowrap">{edit ? <Editable value={play.title} onCommit={(v) => setP("title", v)} /> : play.title}</p>
             </div>
             <div className="content-stretch flex flex-col gap-[2px] items-start w-full">
               <div className="flex gap-[6px] items-center pr-[4px] w-full">
                 <div className="relative shrink-0 size-[24px]"><div className="-translate-x-1/2 -translate-y-1/2 absolute left-1/2 size-[16px] top-1/2"><svg className="block size-full" fill="none" viewBox="0 0 16 16"><path d={svgPaths.p29da5b00} fill="#121212" /></svg></div></div>
-                <p className="flex-[1_0_0] font-['SUIT:Medium',sans-serif] min-w-px overflow-hidden text-[16px] text-black text-ellipsis whitespace-nowrap">{play.venue}</p>
+                <p className="flex-[1_0_0] font-['SUIT:Medium',sans-serif] min-w-px overflow-hidden text-[16px] text-black text-ellipsis whitespace-nowrap">{edit ? <Editable value={play.venue} onCommit={(v) => setP("venue", v)} /> : play.venue}</p>
               </div>
               <div className="flex gap-[6px] items-center pr-[4px] w-full">
                 <div className="relative shrink-0 size-[24px]"><div className="absolute inset-[12.5%_12.5%_0.77%_12.5%]"><svg className="block size-full" fill="none" viewBox="0 0 12.6 14.5705"><path d={svgPaths.p9916500} fill="#121212" /></svg></div></div>
-                <p className="font-['SUIT:Medium',sans-serif] text-[#121212] text-[16px] whitespace-nowrap">{play.from} ~ {play.to}</p>
+                <p className="font-['SUIT:Medium',sans-serif] text-[#121212] text-[16px] whitespace-nowrap">{edit ? <><Editable value={play.from} onCommit={(v) => setP("from", v)} /> ~ <Editable value={play.to} onCommit={(v) => setP("to", v)} /></> : <>{play.from} ~ {play.to}</>}</p>
               </div>
             </div>
             <div className="flex gap-[24px] items-center px-[4px]">
               <div className="flex gap-[10px] items-center">
                 <p className="font-['SUIT:ExtraBold',sans-serif] text-[#121212] text-[14px] whitespace-nowrap">러닝타임</p>
-                <div className="bg-white content-stretch flex h-[30px] items-center justify-center px-[12px] py-[6px] relative rounded-[999px] shrink-0"><div aria-hidden className="absolute border-[#121212] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[999px]" /><p className="font-['SUIT:Bold',sans-serif] text-[#121212] text-[14px] whitespace-nowrap">{play.runtime}</p></div>
+                <div className="bg-white content-stretch flex h-[30px] items-center justify-center px-[12px] py-[6px] relative rounded-[999px] shrink-0"><div aria-hidden className="absolute border-[#121212] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[999px]" /><p className="font-['SUIT:Bold',sans-serif] text-[#121212] text-[14px] whitespace-nowrap">{edit ? <Editable value={play.runtime} onCommit={(v) => setP("runtime", v)} /> : play.runtime}</p></div>
               </div>
               <div className="bg-[#121212] h-[20px] w-px" />
               <div className="flex gap-[10px] items-center">
                 <p className="font-['SUIT:ExtraBold',sans-serif] text-[#121212] text-[14px] whitespace-nowrap">관람연령</p>
-                <div className="bg-[#c3ff83] content-stretch flex items-center justify-center px-[10px] py-[6px] relative rounded-[999px] shrink-0 size-[30px]"><div aria-hidden className="absolute border-[#121212] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[999px]" /><p className="font-['SUIT:Bold',sans-serif] text-[#121212] text-[14px] whitespace-nowrap">{play.age}</p></div>
+                <div className="bg-[#c3ff83] content-stretch flex items-center justify-center px-[10px] py-[6px] relative rounded-[999px] shrink-0 size-[30px]"><div aria-hidden className="absolute border-[#121212] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[999px]" /><p className="font-['SUIT:Bold',sans-serif] text-[#121212] text-[14px] whitespace-nowrap">{edit ? <Editable value={play.age} onCommit={(v) => setP("age", v)} /> : play.age}</p></div>
               </div>
             </div>
             <div className="bg-[rgba(255,183,59,0.2)] relative rounded-[5px] w-full">
               <div aria-hidden className="absolute border border-[var(--accent)] border-solid inset-0 pointer-events-none rounded-[5px]" />
-              <div className="flex items-center p-[10px] w-full"><p className="flex-[1_0_0] font-['SUIT:Bold',sans-serif] min-w-px overflow-hidden text-[16px] text-black text-ellipsis whitespace-nowrap">“{play.quote}”</p></div>
+              <div className="flex items-center p-[10px] w-full"><p className="flex-[1_0_0] font-['SUIT:Bold',sans-serif] min-w-px overflow-hidden text-[16px] text-black text-ellipsis whitespace-nowrap">“{edit ? <Editable value={play.quote} onCommit={(v) => setP("quote", v)} /> : play.quote}”</p></div>
             </div>
           </div>
         </div>
@@ -112,12 +154,12 @@ function DPlayRow({ play, n }: { play: CurationContent["plays"][number]; n: numb
   );
 }
 
-function DContents({ content }: { content: CurationContent }) {
+function DContents({ content, edit }: { content: CurationContent; edit?: CurationEdit }) {
   return (
-    <div className="absolute h-[594px] left-[159px] overflow-clip top-[126px] w-[1254px]" data-name="Contents">
+    <div className={`absolute h-[594px] left-[159px] top-[126px] w-[1254px] ${edit ? "overflow-visible" : "overflow-clip"}`} data-name="Contents">
       <div className="absolute content-stretch flex flex-col items-start left-0 top-[39px] w-[426px]">
-        <DMoodCard c={content} />
-        <DTags tags={content.tags} />
+        <DMoodCard c={content} edit={edit} />
+        <DTags tags={content.tags} edit={edit} />
       </div>
       {content.plays.slice(0, 2).map((_, i) => (
         <div key={i} className="absolute bg-[#121212] h-[10px] left-[424px] w-[25px]" style={{ top: i === 0 ? 102 : 256 }} />
@@ -127,9 +169,12 @@ function DContents({ content }: { content: CurationContent }) {
         {content.plays.map((p, i) => (
           <Fragment key={i}>
             {i > 0 && <div className="bg-[#121212] h-px shrink-0 w-[759px]" />}
-            <DPlayRow play={p} n={i + 1} />
+            <DPlayRow play={p} n={i + 1} i={i} edit={edit} />
           </Fragment>
         ))}
+        {edit ? (
+          <button onClick={edit.onAddPlay} className="w-[759px] border border-dashed border-[#999] rounded-[8px] py-[12px] text-[#666] text-[16px] bg-white/60">+ 공연 추가</button>
+        ) : null}
       </div>
     </div>
   );
@@ -922,12 +967,13 @@ function Contents() {
 export default function Component({
   source = "서울연극센터",
   content = CURATION.seoul,
-}: { data?: unknown; source?: string; content?: CurationContent } = {}) {
+  edit,
+}: { data?: unknown; source?: string; content?: CurationContent; edit?: CurationEdit } = {}) {
   return (
     <div className="bg-[#f7f8f9] relative size-full" data-name="연극1~5">
       <Frame />
       <Frame3 source={source} />
-      <DContents content={content} />
+      <DContents content={content} edit={edit} />
     </div>
   );
 }
