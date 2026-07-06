@@ -206,8 +206,9 @@ function MarkerPin({ item, pos }: { item?: PlayItem; pos: { x: number; y: number
   );
 }
 
-// 랜드마크 — 고정 핀 + 아래 라벨 (공연장 핀과 달리 상시 표시. 서울연극센터/대학로극장 쿼드 등)
-function LandmarkMarker({ x, y, label }: { x: number; y: number; label: string }) {
+// 랜드마크 — 고정 핀 + 라벨 (공연장 핀과 달리 상시 표시. 서울연극센터/대학로극장 쿼드 등)
+// labelBelow=true 면 라벨을 핀 아래에, 아니면 핀 위에 둔다.
+function LandmarkMarker({ x, y, label, labelBelow }: { x: number; y: number; label: string; labelBelow?: boolean }) {
   return (
     <div className="absolute inset-0 z-[19] pointer-events-none" data-name="Landmark">
       {/* 핀 (발끝이 y에 닿고 몸통은 위로) */}
@@ -222,10 +223,14 @@ function LandmarkMarker({ x, y, label }: { x: number; y: number; label: string }
         <path d="M14 35C14 35 25 23 25 13A11 11 0 1 0 3 13C3 23 14 35 14 35Z" fill="#121212" stroke="#ffffff" strokeWidth="1.5" />
         <circle cx="14" cy="13" r="4" fill="#ffffff" />
       </svg>
-      {/* 라벨 — 핀 위 (핀 몸통 31px 위) */}
+      {/* 라벨 — 핀 아래(labelBelow) 또는 핀 위(기본) */}
       <div
         className="absolute bg-[#121212] text-white font-['SUIT:Bold',sans-serif] text-[11px] leading-[normal] px-[8px] py-[3px] rounded-[6px] whitespace-nowrap"
-        style={{ left: x, top: y, transform: "translate(-50%, calc(-100% - 34px))" }}
+        style={
+          labelBelow
+            ? { left: x, top: y + 3, transform: "translate(-50%, 0)" }
+            : { left: x, top: y, transform: "translate(-50%, calc(-100% - 34px))" }
+        }
       >
         {label}
       </div>
@@ -877,7 +882,7 @@ function MapStroke({ marker, apiVenues = [] }: { marker?: PlayItem; apiVenues?: 
           <p className="leading-[18px]">연건캠퍼스/병원</p>
         </div>
         <Station />
-        <LandmarkMarker x={347} y={320} label="서울연극센터" />
+        <LandmarkMarker x={347} y={320} label="서울연극센터" labelBelow />
         <LandmarkMarker x={293} y={144} label="대학로극장 쿼드" />
         {showEdit ? (
           <EditOverlay innerRef={innerRef} apiVenues={apiVenues} />
