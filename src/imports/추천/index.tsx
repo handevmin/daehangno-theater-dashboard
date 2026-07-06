@@ -40,7 +40,7 @@ function Editable({ value, onCommit, className, style }: { value: string; onComm
 // ===== 데이터 기반 추천 콘텐츠 컴포넌트 =====
 function DMoodCard({ c, edit }: { c: CurationContent; edit?: CurationEdit }) {
   return (
-    <div className="bg-[var(--accent)] content-stretch flex flex-col h-[367px] items-center justify-between py-[6px] relative rounded-[12px] shrink-0 w-full">
+    <div className="bg-[var(--accent)] content-stretch flex flex-col items-center py-[6px] pb-[20px] relative rounded-[12px] shrink-0 w-full">
       <div aria-hidden className="absolute border-[2.5px] border-black border-solid inset-0 pointer-events-none rounded-[12px]" />
       <div className="content-stretch flex flex-col items-start relative shrink-0 w-full">
         <div className="flex items-center px-[20px] py-[14px] w-full">
@@ -52,18 +52,9 @@ function DMoodCard({ c, edit }: { c: CurationContent; edit?: CurationEdit }) {
         <div className="flex items-center px-[22px] w-full">
           <p className="flex-[1_0_0] font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] max-h-[46px] min-w-px overflow-hidden text-[#121212] text-[32px] text-ellipsis tracking-[1.28px]">{edit ? <Editable value={c.moodTitle} onCommit={(v) => edit.onField("moodTitle", v)} /> : c.moodTitle}</p>
         </div>
-        <div className="h-[171px] w-full">
+        <div className="w-full">
           <div className="flex items-center justify-center px-[22px] py-[18px] size-full">
-            <p className="flex-[1_0_0] font-['SUIT:SemiBold',sans-serif] h-[97px] leading-[1.5] min-w-px overflow-hidden text-[#121212] text-[18px] text-ellipsis tracking-[-0.36px] whitespace-pre-wrap">{edit ? <Editable value={c.moodDesc} onCommit={(v) => edit.onField("moodDesc", v)} style={{ display: "block", whiteSpace: "pre-wrap" }} /> : c.moodDesc}</p>
-          </div>
-        </div>
-      </div>
-      <div className="relative shrink-0 w-full">
-        <div aria-hidden className="absolute border-black border-solid border-t inset-0 pointer-events-none" />
-        <div className="flex items-center justify-end pb-[18px] pt-[24px] px-[22px] w-full">
-          <div className="bg-[#121212] content-stretch flex items-center justify-center p-[10px] relative rounded-[999px] shrink-0 min-w-[140px]">
-            <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[999px]" />
-            <p className="font-['SUIT:ExtraBold',sans-serif] text-[14px] text-white tracking-[0.14px] whitespace-nowrap">{edit ? <Editable value={c.vibe} onCommit={(v) => edit.onField("vibe", v)} /> : c.vibe}</p>
+            <p className="flex-[1_0_0] font-['SUIT:SemiBold',sans-serif] leading-[1.5] min-w-px overflow-hidden text-[#121212] text-[18px] text-ellipsis tracking-[-0.36px] whitespace-pre-wrap">{edit ? <Editable value={c.moodDesc} onCommit={(v) => edit.onField("moodDesc", v)} style={{ display: "block", whiteSpace: "pre-wrap" }} /> : c.moodDesc}</p>
           </div>
         </div>
       </div>
