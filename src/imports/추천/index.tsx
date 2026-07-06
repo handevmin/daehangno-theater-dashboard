@@ -60,13 +60,7 @@ function DMoodCard({ c, edit }: { c: CurationContent; edit?: CurationEdit }) {
       </div>
       <div className="relative shrink-0 w-full">
         <div aria-hidden className="absolute border-black border-solid border-t inset-0 pointer-events-none" />
-        <div className="flex items-center justify-between pb-[18px] pt-[24px] px-[22px] w-full">
-          <div className="content-stretch flex items-center relative shrink-0">
-            <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] mr-[-3px] text-[#121212] text-[16px] tracking-[0.64px] whitespace-nowrap">추천 분위기</p>
-            <div className="h-[13px] ml-[8px] relative shrink-0 w-[20px]">
-              <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 13"><path d={svgPaths.p13ef1dc0} stroke="black" strokeLinejoin="round" strokeWidth="1.5" /></svg>
-            </div>
-          </div>
+        <div className="flex items-center justify-end pb-[18px] pt-[24px] px-[22px] w-full">
           <div className="bg-[#121212] content-stretch flex items-center justify-center p-[10px] relative rounded-[999px] shrink-0 min-w-[140px]">
             <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[999px]" />
             <p className="font-['SUIT:ExtraBold',sans-serif] text-[14px] text-white tracking-[0.14px] whitespace-nowrap">{edit ? <Editable value={c.vibe} onCommit={(v) => edit.onField("vibe", v)} /> : c.vibe}</p>
