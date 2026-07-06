@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MapComponent from "../../imports/지도";
 import Top5Component from "../../imports/연극15";
 import Top610Component from "../../imports/연극610";
@@ -26,12 +26,19 @@ const DESIGN_WIDTH = 1440;
 const DESIGN_HEIGHT = 1024;
 
 // 화면 순환 순서: 지도 → Top1-5 → Top6-10 → 소극장 Top1-5 → 대시보드 → 서울연극센터 추천 → AI 추천 → (반복)
-const SLIDES = [MapComponent, Top5Component, Top610Component, SmallTop5Component, DashboardComponent, CurationSeoul, CurationAI];
-
 // 지도: 핀 6곳 × 2.8초 = 16.8초 (마지막 핀에서 멈춤).
 // 연극 TOP 1~5 / 6~10 / 소극장 Top1-5: 항목 5개 × 2.8초 = 14초 (마지막 항목에서 멈춤, TopPlaysScreen).
 // 대시보드/추천(서울연극센터·AI): 기본 10초.
-const SLIDE_DURATIONS = [16800, 14000, 14000, 14000, INTERVAL_MS, INTERVAL_MS, INTERVAL_MS];
+// needTop610: 오늘 공연이 5편 이하(=6~10위 없음)면 이 화면은 순환에서 제외한다.
+const BASE_SLIDES: { Comp: (p: { data: DashboardData }) => JSX.Element; dur: number; needTop610?: boolean }[] = [
+  { Comp: MapComponent, dur: 16800 },
+  { Comp: Top5Component, dur: 14000 },
+  { Comp: Top610Component, dur: 14000, needTop610: true },
+  { Comp: SmallTop5Component, dur: 14000 },
+  { Comp: DashboardComponent, dur: INTERVAL_MS },
+  { Comp: CurationSeoul, dur: INTERVAL_MS },
+  { Comp: CurationAI, dur: INTERVAL_MS },
+];
 
 // 캡쳐/디버그용: ?slide=N 이면 해당 슬라이드 고정. ?edit=1 이면 지도(0번) 고정.
 function lockedSlide(): number | null {
@@ -50,8 +57,16 @@ export default function Slideshow() {
   const lock = lockedSlide();
   const [index, setIndex] = useState(lock ?? 0);
   const [scale, setScale] = useState(1);
+  // 오늘 공연이 5편 이하면 6~10위 화면을 순환에서 제외
+  const hasTop610 = (data?.top?.length ?? 0) > 5;
+  const slides = useMemo(
+    () => BASE_SLIDES.filter((s) => !s.needTop610 || hasTop610),
+    [hasTop610],
+  );
+  // 슬라이드 수가 줄어들 때(6~10위 제외) index 가 범위를 벗어나지 않게 보정
+  const safeIndex = Math.min(index, slides.length - 1);
   // 슬라이드별 재마운트 키 — 활성화될 때 +1 해서 마퀴 애니메이션을 처음부터 재시작
-  const [nonces, setNonces] = useState<number[]>(() => SLIDES.map(() => 0));
+  const [nonces, setNonces] = useState<number[]>(() => BASE_SLIDES.map(() => 0));
   // 좌우 이동 버튼: 더블클릭하면 숨기고, 같은 자리를 다시 더블클릭하면 표시
   const [navHidden, setNavHidden] = useState(false);
   // 단일클릭(이동) vs 더블클릭(숨김) 구분용 — 더블클릭 시 이동이 발동하지 않게 지연 처리
@@ -62,7 +77,7 @@ export default function Slideshow() {
       clickTimer.current = null;
     }
     clickTimer.current = window.setTimeout(() => {
-      setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
+      setIndex((i) => (Math.min(i, slides.length - 1) + dir + slides.length) % slides.length);
       clickTimer.current = null;
     }, 220);
   };
@@ -87,21 +102,21 @@ export default function Slideshow() {
   // 슬라이드별 체류 시간만큼 머문 뒤 다음 화면으로 (지도는 핀 6곳 다 돈 뒤 전환)
   useEffect(() => {
     if (!data || lock != null) return; // 슬라이드 고정 시 자동전환 안 함
-    const dur = SLIDE_DURATIONS[index] ?? INTERVAL_MS;
+    const dur = slides[safeIndex]?.dur ?? INTERVAL_MS;
     const id = setTimeout(() => {
-      setIndex((i) => (i + 1) % SLIDES.length);
+      setIndex((i) => (Math.min(i, slides.length - 1) + 1) % slides.length);
     }, dur);
     return () => clearTimeout(id);
-  }, [data, index, lock]);
+  }, [data, safeIndex, lock, slides]);
 
   // 활성 슬라이드만 재마운트 → 그 화면의 마퀴가 처음부터 흐름 (꺼지는 슬라이드는 그대로)
   useEffect(() => {
     setNonces((prev) => {
       const n = [...prev];
-      n[index] = (n[index] ?? 0) + 1;
+      n[safeIndex] = (n[safeIndex] ?? 0) + 1;
       return n;
     });
-  }, [index]);
+  }, [safeIndex]);
 
   if (loading) {
     return (
@@ -132,14 +147,14 @@ export default function Slideshow() {
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-[#f7f8f9]">
-      {SLIDES.map((Slide, i) => (
+      {slides.map((slide, i) => (
         <div
           key={i}
           className="absolute inset-0 flex items-start justify-center transition-opacity ease-in-out"
           style={{
-            opacity: i === index ? 1 : 0,
+            opacity: i === safeIndex ? 1 : 0,
             transitionDuration: `${FADE_MS}ms`,
-            pointerEvents: i === index ? "auto" : "none",
+            pointerEvents: i === safeIndex ? "auto" : "none",
           }}
         >
           <div
@@ -151,7 +166,7 @@ export default function Slideshow() {
               transformOrigin: "top center",
             }}
           >
-            <Slide key={nonces[i]} data={data} />
+            <slide.Comp key={nonces[i]} data={data} />
           </div>
         </div>
       ))}

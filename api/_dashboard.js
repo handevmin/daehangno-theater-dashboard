@@ -346,19 +346,25 @@ export async function buildDashboard() {
     if (top.length >= 10) break
   }
 
-  // 오늘의 소극장 TOP5: 300석 미만 + 연극 + 오픈런 제외 + 오늘 공연 + "대학로 TOP과 중복 안 되게"
+  // 오늘의 소극장 TOP5: 300석 미만 + 연극 + 오픈런 제외 + 오늘 공연
+  // 대학로 TOP10에 없는 소극장 공연을 먼저 채우고, 5개가 안 되면 TOP10에 포함된 소극장 공연으로 5개까지 채운다.
   const topIds = new Set(top.map((t) => t.mt20id))
-  const smallTop = []
+  const smallCandidates = [] // 예매순(pool 순서) 소극장 후보
   for (const p of pool) {
-    if (topIds.has(p.mt20id)) continue // 대학로 TOP에 이미 나온 공연 제외 (중복 방지)
     if (!(p.seatScale > 0 && p.seatScale < 300)) continue // 300석 미만 (좌석 정보 없으면 제외)
     if (p.openrun) continue // 오픈런(상시공연) 제외
     if (p.genre && p.genre !== '연극') continue // 연극만 (뮤지컬 등 제외)
     const ts = todayShow(p)
     if (!ts) continue // 오늘 공연하는 것만
-    smallTop.push({ ...p, rank: smallTop.length + 1, times: ts.times, timeRange: ts.range, dayLabel: ts.dayLabel })
-    if (smallTop.length >= 5) break
+    smallCandidates.push({ p, ts })
   }
+  // TOP10 미포함 우선 → 부족하면 TOP10 포함분으로 보충 (각 그룹 내 예매순 유지)
+  const smallTop = [
+    ...smallCandidates.filter((c) => !topIds.has(c.p.mt20id)),
+    ...smallCandidates.filter((c) => topIds.has(c.p.mt20id)),
+  ]
+    .slice(0, 5)
+    .map(({ p, ts }, i) => ({ ...p, rank: i + 1, times: ts.times, timeRange: ts.range, dayLabel: ts.dayLabel }))
 
   // 곧 시작할 회차 후보(전체, 시각순) — 위치는 프론트의 공연장 좌표 테이블로 매칭/필터한다
   // (KOPIS 좌표는 부정확해서 사용하지 않음)
