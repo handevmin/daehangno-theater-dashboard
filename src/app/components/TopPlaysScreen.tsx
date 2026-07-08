@@ -68,7 +68,6 @@ function Sep() {
 }
 
 function Row({ item, active }: { item: PlayItem; active?: boolean }) {
-  const times = item.times.slice(0, 2);
   return (
     <div className="content-stretch flex gap-[13px] items-end pb-[14px] relative shrink-0 w-full">
       <div aria-hidden className="absolute border-[#121212] border-b border-solid inset-[0_0_-1px_0] pointer-events-none" />
@@ -83,14 +82,6 @@ function Row({ item, active }: { item: PlayItem; active?: boolean }) {
           <div className="content-stretch flex gap-[10px] items-center relative shrink-0 w-full">
             <div className="content-stretch flex flex-[1_0_0] items-center min-w-px relative">
               <MarqueeText text={cleanTitle(item.title)} className="flex-[1_0_0] font-['Elice_DX_Neolli_OTF:Medium',sans-serif] min-w-px text-[#121212] text-[19px]" />
-            </div>
-            <div className="content-stretch flex gap-[6px] items-center relative shrink-0">
-              {times.map((t) => (
-                <div key={t} className="bg-white content-stretch flex flex-col items-center justify-center px-[10px] py-[6px] relative rounded-[4px] shrink-0 w-[70px]">
-                  <div aria-hidden className="absolute border border-black border-solid inset-0 pointer-events-none rounded-[4px]" />
-                  <p className="font-['SUIT:ExtraBold',sans-serif] text-[#121212] text-[15px] text-center">{t}</p>
-                </div>
-              ))}
             </div>
           </div>
           <div className="content-stretch flex gap-[12px] items-center relative shrink-0 w-[390px]">
