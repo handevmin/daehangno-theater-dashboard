@@ -337,17 +337,15 @@ export async function buildDashboard() {
 
   // 1) 대학로 연극 풀 → TOP 10 + 곧 시작할 회차 (한 번의 풀에서 파생)
   const pool = await getDaehakroPool(fmt(stdate), fmt(eddate), 60)
-  // TOP10: "오늘 실제 공연하는" 작품만 예매순위대로 추려 1~10위 재부여 (개막 전 선예매 등 제외)
+  // 이번주 대학로 연극 TOP10: 이번주 예매순위(pool 순서)대로 1~10위 재부여
   const top = []
   for (const p of pool) {
-    const ts = todayShow(p)
-    if (!ts) continue
-    top.push({ ...p, rank: top.length + 1, times: ts.times, timeRange: ts.range, dayLabel: ts.dayLabel })
+    top.push({ ...p, rank: top.length + 1 })
     if (top.length >= 10) break
   }
 
-  // 이번주 소극장 연극 TOP10: 연극 + 1~300석 + 이번주 예매순위(pool 순서)
-  // "오늘 공연" 조건 없이 주간 랭킹 기준. 일반(오늘의 대학로) 연극순위(top)와 중복되는 작품은 제외.
+  // 이번주 소극장 연극 TOP5: 연극 + 1~300석 + 이번주 예매순위(pool 순서)
+  // 일반(이번주 대학로) 연극순위(top)와 중복되는 작품은 제외.
   const topIds = new Set(top.map((t) => t.mt20id))
   const smallTop = []
   for (const p of pool) {
@@ -355,7 +353,7 @@ export async function buildDashboard() {
     if (!(p.seatScale >= 1 && p.seatScale <= 300)) continue // 1~300석 (좌석 정보 없으면 제외)
     if (p.genre && p.genre !== '연극') continue // 연극만 (뮤지컬 등 제외)
     smallTop.push({ ...p, rank: smallTop.length + 1 }) // 이번주 예매순 → 1위부터 재부여
-    if (smallTop.length >= 10) break
+    if (smallTop.length >= 5) break
   }
 
   // 곧 시작할 회차 후보(전체, 시각순) — 위치는 프론트의 공연장 좌표 테이블로 매칭/필터한다
