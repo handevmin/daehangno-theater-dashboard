@@ -10,7 +10,11 @@ import {
   COVER_IMG,
   type CharKey,
 } from "./quizData";
+import { fetchDashboard, proxyImg, type PlayItem } from "../../lib/kopis";
 import "./quiz.css";
+
+// 대시보드 연극 제목의 "[대학로]" 등 꼬리표 제거
+const cleanTitle = (t: string) => t.replace(/\s*\[[^\]]*\]\s*$/, "").trim();
 
 type Stage = "start" | "quiz" | "loading" | "result";
 
@@ -25,6 +29,22 @@ export default function QuizPage() {
     () => (picks.length === total ? computeResult(picks) : null),
     [picks, total],
   );
+
+  // 이달의 추천 공연 — 대시보드(이번주 대학로 연극 Top)에서 1위 공연을 가져온다.
+  const [recommend, setRecommend] = useState<PlayItem | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetchDashboard()
+      .then((d) => {
+        if (alive) setRecommend(d.top?.[0] ?? null);
+      })
+      .catch(() => {
+        /* 추천 공연은 부가 기능이라 실패해도 무시 */
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   // 페이지 진입 시 문서 제목 갱신
   useEffect(() => {
@@ -110,7 +130,12 @@ export default function QuizPage() {
         )}
         {stage === "loading" && <LoadingView />}
         {stage === "result" && resultKey && (
-          <ResultView charKey={resultKey} onRestart={restart} onShare={share} />
+          <ResultView
+            charKey={resultKey}
+            recommend={recommend}
+            onRestart={restart}
+            onShare={share}
+          />
         )}
       </div>
     </div>
@@ -203,10 +228,12 @@ function LoadingView() {
 /* ── 결과 ── */
 function ResultView({
   charKey,
+  recommend,
   onRestart,
   onShare,
 }: {
   charKey: CharKey;
+  recommend: PlayItem | null;
   onRestart: () => void;
   onShare: () => void;
 }) {
@@ -244,6 +271,8 @@ function ResultView({
         </div>
       </div>
 
+      {recommend && <RecommendCard play={recommend} />}
+
       <div className="gcq-actions">
         <button className="gcq-btn" onClick={onShare}>
           <Share2 />
@@ -265,6 +294,42 @@ function ChemCol({ chem }: { chem: { label: string; char: CharKey } }) {
       <div className="gcq-chem-label">{chem.label}</div>
       <img className="gcq-chem-img" src={circleImg(chem.char)} alt={c.name} />
       <div className="gcq-chem-name">{c.name}</div>
+    </div>
+  );
+}
+
+/* ── 이달의 추천 공연 (대시보드 이번주 대학로 연극 1위) ── */
+function RecommendCard({ play }: { play: PlayItem }) {
+  const url = play.reservations?.[0]?.url || "";
+  const period =
+    play.periodFrom && play.periodTo
+      ? `${play.periodFrom} ~ ${play.periodTo}`
+      : play.periodRaw || "";
+  const Wrapper = url ? "a" : "div";
+  return (
+    <div className="gcq-rec">
+      <div className="gcq-rec-heading">이달의 추천 공연</div>
+      <Wrapper
+        className="gcq-rec-card"
+        {...(url
+          ? { href: url, target: "_blank", rel: "noreferrer" }
+          : {})}
+      >
+        {play.poster && (
+          <img
+            className="gcq-rec-poster"
+            src={proxyImg(play.poster)}
+            alt={cleanTitle(play.title)}
+          />
+        )}
+        <div className="gcq-rec-info">
+          <span className="gcq-rec-genre">{play.genre || "연극"}</span>
+          <div className="gcq-rec-title">{cleanTitle(play.title)}</div>
+          {play.venue && <div className="gcq-rec-venue">{play.venue}</div>}
+          {period && <div className="gcq-rec-period">{period}</div>}
+          {url && <span className="gcq-rec-cta">예매하러 가기 →</span>}
+        </div>
+      </Wrapper>
     </div>
   );
 }
