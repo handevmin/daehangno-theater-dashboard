@@ -389,6 +389,9 @@
   margin-bottom: 12px;
   padding-left: 2px;
 }
+.gcq-rec-heading-name {
+  color: var(--gold-bottom);
+}
 .gcq-rec-card {
   display: flex;
   gap: 14px;

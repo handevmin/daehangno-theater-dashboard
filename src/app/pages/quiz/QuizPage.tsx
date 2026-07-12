@@ -16,6 +16,42 @@ import "./quiz.css";
 // 대시보드 연극 제목의 "[대학로]" 등 꼬리표 제거
 const cleanTitle = (t: string) => t.replace(/\s*\[[^\]]*\]\s*$/, "").trim();
 
+// 캐릭터별 추천용 무드 키워드 — 현재 공연의 제목/소개글에서 이 단어들을 찾아 매칭한다.
+const CHAR_KEYWORDS: Record<CharKey, string[]> = {
+  hamlet: ["고독", "고뇌", "심리", "복수", "죽음", "질문", "사색", "미스터리", "존재", "선택", "우울"],
+  macbeth: ["야망", "권력", "욕망", "몰락", "배신", "승부", "범죄", "비극", "왕", "음모"],
+  romeo: ["사랑", "로맨스", "연애", "멜로", "청춘", "설렘", "이별", "운명", "그대", "연인"],
+  oedipus: ["진실", "비밀", "추리", "미스터리", "수사", "정체", "반전", "사건", "실체", "추적"],
+  nora: ["여성", "자유", "독립", "자아", "성장", "엄마", "그녀", "여자", "떠나", "나를"],
+  antigone: ["정의", "신념", "저항", "양심", "용기", "진실", "법", "싸움", "지키", "옳"],
+  falstaff: ["코미디", "유쾌", "웃음", "코믹", "개그", "유머", "행복", "즐거", "발칙", "한바탕", "축제"],
+  faust: ["욕망", "성장", "초월", "거래", "꿈", "도전", "환상", "변신", "계약", "열망"],
+};
+
+// 캐릭터 고정 순서 — 키워드 매칭 실패 시 서로 다른 공연을 배정하기 위한 인덱스
+const CHAR_ORDER: CharKey[] = [
+  "hamlet", "macbeth", "romeo", "oedipus", "nora", "antigone", "falstaff", "faust",
+];
+
+// 결과 캐릭터에게 어울리는 공연 1편 선택.
+// 1) 무드 키워드가 제목/소개글/장르에 가장 많이 걸리는 공연 우선
+// 2) 매칭이 없으면 캐릭터 고정 인덱스로 배정(캐릭터마다 다른 현재 공연 보장)
+function pickRecommend(charKey: CharKey, plays: PlayItem[]): PlayItem | null {
+  if (!plays.length) return null;
+  const kws = CHAR_KEYWORDS[charKey] ?? [];
+  const scored = plays.map((p) => {
+    const hay = `${p.title} ${p.intro ?? ""} ${p.genre ?? ""}`;
+    const score = kws.reduce((s, k) => (hay.includes(k) ? s + 1 : s), 0);
+    return { p, score };
+  });
+  const best = scored
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)[0];
+  if (best) return best.p;
+  const idx = CHAR_ORDER.indexOf(charKey);
+  return plays[(idx >= 0 ? idx : 0) % plays.length];
+}
+
 type Stage = "start" | "quiz" | "loading" | "result";
 
 export default function QuizPage() {
@@ -30,13 +66,20 @@ export default function QuizPage() {
     [picks, total],
   );
 
-  // 이달의 추천 공연 — 대시보드(이번주 대학로 연극 Top)에서 1위 공연을 가져온다.
-  const [recommend, setRecommend] = useState<PlayItem | null>(null);
+  // 추천 후보 풀 — 대시보드의 이번주 대학로 연극(top) + 소극장(smallTop)을 합쳐 중복 제거.
+  const [plays, setPlays] = useState<PlayItem[]>([]);
   useEffect(() => {
     let alive = true;
     fetchDashboard()
       .then((d) => {
-        if (alive) setRecommend(d.top?.[0] ?? null);
+        if (!alive) return;
+        const seen = new Set<string>();
+        const pool = [...(d.top ?? []), ...(d.smallTop ?? [])].filter((p) => {
+          if (seen.has(p.mt20id)) return false;
+          seen.add(p.mt20id);
+          return true;
+        });
+        setPlays(pool);
       })
       .catch(() => {
         /* 추천 공연은 부가 기능이라 실패해도 무시 */
@@ -45,6 +88,12 @@ export default function QuizPage() {
       alive = false;
     };
   }, []);
+
+  // 결과 캐릭터에게 어울리는 공연 (캐릭터별 맞춤)
+  const recommend = useMemo(
+    () => (resultKey ? pickRecommend(resultKey, plays) : null),
+    [resultKey, plays],
+  );
 
   // 페이지 진입 시 문서 제목 갱신
   useEffect(() => {
@@ -271,7 +320,7 @@ function ResultView({
         </div>
       </div>
 
-      {recommend && <RecommendCard play={recommend} />}
+      {recommend && <RecommendCard play={recommend} charName={r.name} />}
 
       <div className="gcq-actions">
         <button className="gcq-btn" onClick={onShare}>
@@ -298,8 +347,8 @@ function ChemCol({ chem }: { chem: { label: string; char: CharKey } }) {
   );
 }
 
-/* ── 이달의 추천 공연 (대시보드 이번주 대학로 연극 1위) ── */
-function RecommendCard({ play }: { play: PlayItem }) {
+/* ── 캐릭터별 맞춤 추천 공연 (대시보드 이번주 대학로 연극에서 매칭) ── */
+function RecommendCard({ play, charName }: { play: PlayItem; charName: string }) {
   const url = play.reservations?.[0]?.url || "";
   const period =
     play.periodFrom && play.periodTo
@@ -308,7 +357,9 @@ function RecommendCard({ play }: { play: PlayItem }) {
   const Wrapper = url ? "a" : "div";
   return (
     <div className="gcq-rec">
-      <div className="gcq-rec-heading">이달의 추천 공연</div>
+      <div className="gcq-rec-heading">
+        <span className="gcq-rec-heading-name">{charName}</span>에게 어울리는 공연
+      </div>
       <Wrapper
         className="gcq-rec-card"
         {...(url
