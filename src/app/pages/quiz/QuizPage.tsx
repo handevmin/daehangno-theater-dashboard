@@ -33,7 +33,7 @@ const CHAR_ORDER: CharKey[] = [
   "hamlet", "macbeth", "romeo", "oedipus", "nora", "antigone", "falstaff", "faust",
 ];
 
-// 결과 캐릭터에게 어울리는 공연 1편 선택.
+// 결과 캐릭터에게 어울리는 공연 1편 선택 (폴백용 클라이언트 매칭).
 // 1) 무드 키워드가 제목/소개글/장르에 가장 많이 걸리는 공연 우선
 // 2) 매칭이 없으면 캐릭터 고정 인덱스로 배정(캐릭터마다 다른 현재 공연 보장)
 function pickRecommend(charKey: CharKey, plays: PlayItem[]): PlayItem | null {
@@ -52,6 +52,31 @@ function pickRecommend(charKey: CharKey, plays: PlayItem[]): PlayItem | null {
   return plays[(idx >= 0 ? idx : 0) % plays.length];
 }
 
+// 추천 카드가 쓰는 정규화 형태 (AI 응답 / 폴백 공통)
+interface Recommend {
+  title: string;
+  poster: string;
+  genre: string;
+  venue: string;
+  periodFrom?: string;
+  periodTo?: string;
+  url?: string;
+  reason?: string;
+}
+function toRecommend(p: PlayItem | null): Recommend | null {
+  if (!p) return null;
+  return {
+    title: p.title,
+    poster: p.poster,
+    genre: p.genre,
+    venue: p.venue,
+    periodFrom: p.periodFrom,
+    periodTo: p.periodTo,
+    url: p.reservations?.[0]?.url || "",
+    reason: "",
+  };
+}
+
 type Stage = "start" | "quiz" | "loading" | "result";
 
 export default function QuizPage() {
@@ -66,23 +91,35 @@ export default function QuizPage() {
     [picks, total],
   );
 
-  // 추천 후보 풀 — 대시보드의 이번주 대학로 연극(top) + 소극장(smallTop)을 합쳐 중복 제거.
+  // 캐릭터별 추천 공연 —
+  // 1순위: 매일 GPT가 정해두는 /api/quiz-recommend (하루 고정, 캐릭터→연극 맵)
+  // 폴백: 대시보드 풀 + 클라이언트 키워드 매칭
+  const [recMap, setRecMap] = useState<Record<string, Recommend> | null>(null);
   const [plays, setPlays] = useState<PlayItem[]>([]);
   useEffect(() => {
     let alive = true;
-    fetchDashboard()
+    fetch("/api/quiz-recommend")
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => {
-        if (!alive) return;
-        const seen = new Set<string>();
-        const pool = [...(d.top ?? []), ...(d.smallTop ?? [])].filter((p) => {
-          if (seen.has(p.mt20id)) return false;
-          seen.add(p.mt20id);
-          return true;
-        });
-        setPlays(pool);
+        if (alive && d?.map) setRecMap(d.map);
       })
       .catch(() => {
-        /* 추천 공연은 부가 기능이라 실패해도 무시 */
+        // 폴백: 대시보드 풀을 받아 클라이언트에서 키워드 매칭
+        fetchDashboard()
+          .then((d) => {
+            if (!alive) return;
+            const seen = new Set<string>();
+            setPlays(
+              [...(d.top ?? []), ...(d.smallTop ?? [])].filter((p) => {
+                if (seen.has(p.mt20id)) return false;
+                seen.add(p.mt20id);
+                return true;
+              }),
+            );
+          })
+          .catch(() => {
+            /* 추천 공연은 부가 기능이라 실패해도 무시 */
+          });
       });
     return () => {
       alive = false;
@@ -90,10 +127,12 @@ export default function QuizPage() {
   }, []);
 
   // 결과 캐릭터에게 어울리는 공연 (캐릭터별 맞춤)
-  const recommend = useMemo(
-    () => (resultKey ? pickRecommend(resultKey, plays) : null),
-    [resultKey, plays],
-  );
+  const recommend = useMemo<Recommend | null>(() => {
+    if (!resultKey) return null;
+    if (recMap && recMap[resultKey]) return recMap[resultKey];
+    if (plays.length) return toRecommend(pickRecommend(resultKey, plays));
+    return null;
+  }, [resultKey, recMap, plays]);
 
   // 페이지 진입 시 문서 제목 갱신
   useEffect(() => {
@@ -282,7 +321,7 @@ function ResultView({
   onShare,
 }: {
   charKey: CharKey;
-  recommend: PlayItem | null;
+  recommend: Recommend | null;
   onRestart: () => void;
   onShare: () => void;
 }) {
@@ -320,7 +359,7 @@ function ResultView({
         </div>
       </div>
 
-      {recommend && <RecommendCard play={recommend} charName={r.name} />}
+      {recommend && <RecommendCard rec={recommend} charName={r.name} />}
 
       <div className="gcq-actions">
         <button className="gcq-btn" onClick={onShare}>
@@ -347,13 +386,11 @@ function ChemCol({ chem }: { chem: { label: string; char: CharKey } }) {
   );
 }
 
-/* ── 캐릭터별 맞춤 추천 공연 (대시보드 이번주 대학로 연극에서 매칭) ── */
-function RecommendCard({ play, charName }: { play: PlayItem; charName: string }) {
-  const url = play.reservations?.[0]?.url || "";
+/* ── 캐릭터별 맞춤 추천 공연 (매일 GPT가 대학로 연극에서 배정) ── */
+function RecommendCard({ rec, charName }: { rec: Recommend; charName: string }) {
+  const url = rec.url || "";
   const period =
-    play.periodFrom && play.periodTo
-      ? `${play.periodFrom} ~ ${play.periodTo}`
-      : play.periodRaw || "";
+    rec.periodFrom && rec.periodTo ? `${rec.periodFrom} ~ ${rec.periodTo}` : "";
   const Wrapper = url ? "a" : "div";
   return (
     <div className="gcq-rec">
@@ -362,21 +399,20 @@ function RecommendCard({ play, charName }: { play: PlayItem; charName: string })
       </div>
       <Wrapper
         className="gcq-rec-card"
-        {...(url
-          ? { href: url, target: "_blank", rel: "noreferrer" }
-          : {})}
+        {...(url ? { href: url, target: "_blank", rel: "noreferrer" } : {})}
       >
-        {play.poster && (
+        {rec.poster && (
           <img
             className="gcq-rec-poster"
-            src={proxyImg(play.poster)}
-            alt={cleanTitle(play.title)}
+            src={proxyImg(rec.poster)}
+            alt={cleanTitle(rec.title)}
           />
         )}
         <div className="gcq-rec-info">
-          <span className="gcq-rec-genre">{play.genre || "연극"}</span>
-          <div className="gcq-rec-title">{cleanTitle(play.title)}</div>
-          {play.venue && <div className="gcq-rec-venue">{play.venue}</div>}
+          <span className="gcq-rec-genre">{rec.genre || "연극"}</span>
+          <div className="gcq-rec-title">{cleanTitle(rec.title)}</div>
+          {rec.reason && <div className="gcq-rec-reason">“{rec.reason}”</div>}
+          {rec.venue && <div className="gcq-rec-venue">{rec.venue}</div>}
           {period && <div className="gcq-rec-period">{period}</div>}
           {url && <span className="gcq-rec-cta">예매하러 가기 →</span>}
         </div>
