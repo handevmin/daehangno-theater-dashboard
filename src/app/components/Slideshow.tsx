@@ -5,6 +5,7 @@ import Top610Component from "../../imports/연극610";
 import SmallTop5Component from "../../imports/소극장15";
 import DashboardComponent from "../../imports/대시보드";
 import CurationComponent from "../../imports/추천";
+import QuizPromoComponent from "../../imports/극캐감별사";
 import { useDashboardData } from "../hooks/useDashboardData";
 import type { DashboardData } from "../lib/kopis";
 import { CURATION } from "../lib/curation";
@@ -25,7 +26,7 @@ const FADE_MS = 1000; // 크로스페이드 시간
 const DESIGN_WIDTH = 1440;
 const DESIGN_HEIGHT = 1024;
 
-// 화면 순환 순서: 지도 → Top1-5 → Top6-10 → 소극장 Top1-5 → 대시보드 → 서울연극센터 추천 → AI 추천 → (반복)
+// 화면 순환 순서: 지도 → Top1-5 → Top6-10 → 소극장 Top1-5 → 대시보드 → 서울연극센터 추천 → AI 추천 → 극캐감별사 → (반복)
 // 지도: 핀 6곳 × 2.8초 = 16.8초 (마지막 핀에서 멈춤).
 // 연극 TOP 1~5 / 6~10 / 소극장 Top1-5: 항목 5개 × 2.8초 = 14초 (마지막 항목에서 멈춤, TopPlaysScreen).
 // 대시보드/추천(서울연극센터·AI): 기본 10초.
@@ -38,6 +39,7 @@ const BASE_SLIDES: { Comp: (p: { data: DashboardData }) => JSX.Element; dur: num
   { Comp: DashboardComponent, dur: INTERVAL_MS },
   { Comp: CurationSeoul, dur: INTERVAL_MS },
   { Comp: CurationAI, dur: INTERVAL_MS },
+  { Comp: QuizPromoComponent, dur: INTERVAL_MS },
 ];
 
 // 캡쳐/디버그용: ?slide=N 이면 해당 슬라이드 고정. ?edit=1 이면 지도(0번) 고정.
