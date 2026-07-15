@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { QRCode } from "../../app/components/QRCode";
 import imgNora from "./nora.png";
 import imgRomeo from "./romeo.png";
@@ -12,15 +13,75 @@ import imgAvatar3 from "./avatar3.png";
 import imgAvatar4 from "./avatar4.png";
 
 // 극캐감별사(/quiz) 홍보 슬라이드 — QR 스캔으로 모바일 심리테스트 유도.
-// 카드 캐릭터 6종: 노라 · 로미오 · 맥베스(강조) · 안티고네 · 팔스타프 · 햄릿
+// 카드 캐릭터 6종이 한 칸씩 왼쪽으로 슬라이드하며, 가운데(3번째) 카드가 강조(골드+대사)된다.
+
+// 카드 슬라이더 치수/타이밍
+const CARD_W = 268;
+const GAP = 14;
+const STEP = CARD_W + GAP; // 한 칸 이동 거리
+const FEATURED_SLOT = 2; // 강조 카드가 놓이는 화면상 슬롯(0-based) = 가운데
+const HOLD_MS = 2600; // 캐릭터당 노출 시간
+const SLIDE_MS = 620; // 슬라이드 전환 시간
+
+interface Character {
+  name: string;
+  desc: string;
+  img: string;
+  crop: string; // 카드 프레임에 맞춘 이미지 크롭(컨테이너 대비 %라 일반/강조 카드에 공용)
+  quote: string[]; // 강조 카드 대사 (최대 3줄)
+  source: string;
+}
 
 // 캐릭터별 이미지 크롭(피그마 원본 배치 그대로 — 몸통이 카드 프레임에 맞게 확대·이동됨)
-const CHARACTERS: { name: string; desc: string; img: string; crop: string }[] = [
-  { name: "노라", desc: "삶을 개척하는 독립가", img: imgNora, crop: "h-[145.27%] left-[-25.48%] top-[-22.85%] w-[151.55%]" },
-  { name: "로미오", desc: "순수하고 뜨거운 로맨티스트", img: imgRomeo, crop: "h-[146.11%] left-[-25.58%] top-[-19.44%] w-[152.91%]" },
-  { name: "안티고네", desc: "단단하고 고결한 신념가", img: imgAntigone, crop: "h-[136.67%] left-[-19.19%] top-[-16.67%] w-[143.02%]" },
-  { name: "팔스타프", desc: "현재를 즐기는 감각주의자", img: imgFalstaff, crop: "h-[134.67%] left-[-20.54%] top-[-15.06%] w-[141.09%]" },
-  { name: "햄릿", desc: "야망으로 불타는 승부사", img: imgHamlet, crop: "h-[138.33%] left-[-21.51%] top-[-13.89%] w-[144.77%]" },
+const CHARACTERS: Character[] = [
+  {
+    name: "노라",
+    desc: "삶을 개척하는 독립가",
+    img: imgNora,
+    crop: "h-[145.27%] left-[-25.48%] top-[-22.85%] w-[151.55%]",
+    quote: ["“전 이제 제 자신을 알아야 해요.", "저에게는 제 인생이 있어요”"],
+    source: "헨리크 입센 『인형의 집』",
+  },
+  {
+    name: "로미오",
+    desc: "순수하고 뜨거운 로맨티스트",
+    img: imgRomeo,
+    crop: "h-[146.11%] left-[-25.58%] top-[-19.44%] w-[152.91%]",
+    quote: ["“저곳이 동쪽이라면", "줄리엣은 태양이로구나!”"],
+    source: "윌리엄 셰익스피어 『로미오와 줄리엣』",
+  },
+  {
+    name: "맥베스",
+    desc: "야망으로 불타는 승부사",
+    img: imgMacbeth,
+    crop: "h-[152.78%] left-[-32.56%] top-[-23.89%] w-[159.88%]",
+    quote: ["“별들이여, 빛을 감추어라!", "나의 검고 깊은 야망은 비추지 말거라.”"],
+    source: "윌리엄 셰익스피어 『맥베스』",
+  },
+  {
+    name: "안티고네",
+    desc: "단단하고 고결한 신념가",
+    img: imgAntigone,
+    crop: "h-[136.67%] left-[-19.19%] top-[-16.67%] w-[143.02%]",
+    quote: ["“허나 나는 그를 묻겠노라—", "설령 죽음을 맞이한다 하여도,", "이 죄가 곧 성스러운 일이라 단언하노라”"],
+    source: "소포클레스 『안티고네』",
+  },
+  {
+    name: "팔스타프",
+    desc: "현재를 즐기는 감각주의자",
+    img: imgFalstaff,
+    crop: "h-[134.67%] left-[-20.54%] top-[-15.06%] w-[141.09%]",
+    quote: ["“명예가 무엇이냐? 한낱 말일 뿐.", "그 말 속에 무엇이 있느냐? 공기뿐이다”"],
+    source: "윌리엄 셰익스피어 『헨리 4세』",
+  },
+  {
+    name: "햄릿",
+    desc: "신중하고 깊이 있는 사색가",
+    img: imgHamlet,
+    crop: "h-[138.33%] left-[-21.51%] top-[-13.89%] w-[144.77%]",
+    quote: ["“죽느냐 사느냐, 그것이 문제로다”"],
+    source: "윌리엄 셰익스피어 『햄릿』",
+  },
 ];
 
 // 겹쳐 놓은 참여자 아바타(원형) — 마지막 칸은 "+8"
@@ -40,7 +101,7 @@ function Chevron({ className }: { className?: string }) {
 }
 
 // 일반 캐릭터 카드 (268×268)
-function CharCard({ name, desc, img, crop }: (typeof CHARACTERS)[number]) {
+function CharCard({ name, desc, img, crop }: Character) {
   return (
     <div className="bg-[#e6e4e0] relative rounded-[17.48px] shrink-0 size-[268px]">
       <div className="-translate-x-1/2 absolute bottom-[123px] h-[180px] left-1/2 w-[172px]">
@@ -56,24 +117,27 @@ function CharCard({ name, desc, img, crop }: (typeof CHARACTERS)[number]) {
   );
 }
 
-// 강조 카드 — 맥베스 (268×297, 대사 인용 포함)
-function FeaturedCard() {
+// 강조 카드 (268×297, 골드 배경 + 대사 인용) — 슬라이더 가운데 칸
+function FeaturedCard({ name, img, crop, quote, source }: Character) {
   return (
     <div className="bg-[#ffb73b] h-[297px] relative rounded-[17.48px] shrink-0 w-[268px]">
       <div className="-translate-x-1/2 absolute bottom-[150px] h-[200px] left-1/2 w-[190px]">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <img alt="맥베스" className="absolute h-[152.78%] left-[-32.56%] max-w-none top-[-23.89%] w-[159.88%]" src={imgMacbeth} />
+          <img alt={name} className={`absolute max-w-none ${crop}`} src={img} />
         </div>
       </div>
       <div className="-translate-x-1/2 absolute content-stretch flex flex-col h-[150px] items-center justify-between left-1/2 pb-[19.228px] pt-[8.74px] px-[17.48px] text-[#121212] text-center top-[147px] w-[268px]">
         <div className="content-stretch flex flex-col gap-[6px] items-center relative shrink-0 w-full">
-          <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[1.5] text-[22px] w-full">맥베스</p>
+          <p className="font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[1.5] text-[22px] w-full">{name}</p>
           <div className="font-['SUIT:SemiBold',sans-serif] text-[15px] tracking-[-0.3px] w-full">
-            <p className="leading-[normal] mb-0">“별들이여, 빛을 감추어라!</p>
-            <p className="leading-[normal]">나의 검고 깊은 야망은 비추지 말거라.”</p>
+            {quote.map((line, i) => (
+              <p key={i} className="leading-[normal] mb-0">
+                {line}
+              </p>
+            ))}
           </div>
         </div>
-        <p className="font-['SUIT:Medium',sans-serif] leading-[normal] shrink-0 text-[13px] w-full">윌리엄 셰익스피어 『맥베스』</p>
+        <p className="font-['SUIT:Medium',sans-serif] leading-[normal] shrink-0 text-[13px] w-full">{source}</p>
       </div>
     </div>
   );
@@ -81,6 +145,37 @@ function FeaturedCard() {
 
 export default function Component() {
   const quizUrl = `${window.location.origin}/quiz`;
+
+  // 카드 스트립: 한 칸(step)씩 왼쪽으로 이동. 강조 카드는 항상 화면 가운데 칸(step + FEATURED_SLOT).
+  // 한 바퀴(CHARACTERS.length) 돌면 화면이 시작과 동일해지므로, 그 순간 애니메이션을 끄고
+  // step 을 0 으로 되돌려 무한 순환을 이음매 없이 만든다.
+  const LEN = CHARACTERS.length;
+  const [step, setStep] = useState(0);
+  const [anim, setAnim] = useState(true);
+
+  useEffect(() => {
+    if (step >= LEN) {
+      // 마지막 전환이 끝나면 티 나지 않게 원점으로 스냅
+      const t = setTimeout(() => {
+        setAnim(false);
+        setStep(0);
+      }, SLIDE_MS);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => setStep((s) => s + 1), HOLD_MS);
+    return () => clearTimeout(t);
+  }, [step, LEN]);
+
+  // 스냅 직후 다음 프레임에 트랜지션 복구 (스냅 자체는 애니메이션 없이)
+  useEffect(() => {
+    if (anim) return;
+    const r = requestAnimationFrame(() => requestAnimationFrame(() => setAnim(true)));
+    return () => cancelAnimationFrame(r);
+  }, [anim]);
+
+  // 3벌 반복 → step..step+5 창과 강조(step+2)가 항상 채워진다
+  const cards = [...CHARACTERS, ...CHARACTERS, ...CHARACTERS];
+
   return (
     <div className="bg-[#f7f8f9] relative size-full" data-name="극캐감별사">
       {/* 제목 형광펜 하이라이트 */}
@@ -139,15 +234,23 @@ export default function Component() {
         </div>
       </div>
 
-      {/* 캐릭터 카드 스트립 (1440px 폭 초과분은 잘림) */}
+      {/* 캐릭터 카드 스트립 — 한 칸씩 슬라이드하며 가운데 카드가 강조 (1440px 초과분은 잘림) */}
       <div className="absolute h-[350px] left-0 overflow-clip top-[328px] w-[1440px]">
-        <div className="absolute content-stretch flex gap-[14px] items-end left-0 px-[24px] top-[53px]">
-          <CharCard {...CHARACTERS[0]} />
-          <CharCard {...CHARACTERS[1]} />
-          <FeaturedCard />
-          <CharCard {...CHARACTERS[2]} />
-          <CharCard {...CHARACTERS[3]} />
-          <CharCard {...CHARACTERS[4]} />
+        <div
+          className="absolute content-stretch flex items-end left-0 px-[24px] top-[53px]"
+          style={{
+            gap: GAP,
+            transform: `translateX(${-step * STEP}px)`,
+            transition: anim ? `transform ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1)` : "none",
+          }}
+        >
+          {cards.map((c, i) =>
+            i === step + FEATURED_SLOT ? (
+              <FeaturedCard key={i} {...c} />
+            ) : (
+              <CharCard key={i} {...c} />
+            ),
+          )}
         </div>
       </div>
     </div>

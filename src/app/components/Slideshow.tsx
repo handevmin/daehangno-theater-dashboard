@@ -39,7 +39,8 @@ const BASE_SLIDES: { Comp: (p: { data: DashboardData }) => JSX.Element; dur: num
   { Comp: DashboardComponent, dur: INTERVAL_MS },
   { Comp: CurationSeoul, dur: INTERVAL_MS },
   { Comp: CurationAI, dur: INTERVAL_MS },
-  { Comp: QuizPromoComponent, dur: INTERVAL_MS },
+  // 캐릭터 카드 6종 × 2.6초 슬라이드 = 15.6초 → 한 바퀴 다 보이도록 여유 있게
+  { Comp: QuizPromoComponent, dur: 16800 },
 ];
 
 // 캡쳐/디버그용: ?slide=N 이면 해당 슬라이드 고정. ?edit=1 이면 지도(0번) 고정.
