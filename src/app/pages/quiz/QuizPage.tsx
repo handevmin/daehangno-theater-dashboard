@@ -234,14 +234,17 @@ export default function QuizPage() {
 function StartView({ onStart }: { onStart: () => void }) {
   return (
     <div className="gcq-start">
-      <h1 className="gcq-title">{META.title}</h1>
-      <p className="gcq-subtitle">{META.subtitle}</p>
-      <img className="gcq-cover" src={COVER_IMG} alt="극캐감별사 표지" />
-      <button className="gcq-btn" onClick={onStart}>
-        <ChevronRight />
-        {META.startButton}
-      </button>
-      {/* 주최/주관 로고 */}
+      {/* 본문 — 남는 공간에서 세로 중앙 */}
+      <div className="gcq-start-main">
+        <h1 className="gcq-title">{META.title}</h1>
+        <p className="gcq-subtitle">{META.subtitle}</p>
+        <img className="gcq-cover" src={COVER_IMG} alt="극캐감별사 표지" />
+        <button className="gcq-btn" onClick={onStart}>
+          <ChevronRight />
+          {META.startButton}
+        </button>
+      </div>
+      {/* 주최/주관 로고 — 화면 하단에 고정 */}
       <div className="gcq-logos">
         <img className="gcq-logo-sfac" src="/quiz/logo/sfac.png" alt="서울문화재단" />
         <img className="gcq-logo-dh" src="/quiz/logo/daehakro.png" alt="樂 대학로" />

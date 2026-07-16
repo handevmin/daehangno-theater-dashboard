@@ -71,11 +71,17 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  text-align: center;
+  padding: 40px 28px 40px;
+}
+/* 본문(제목·표지·시작 버튼)은 로고를 뺀 남는 공간에서 세로 중앙 */
+.gcq-start-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 40px 28px 56px;
-  gap: 0;
+  width: 100%;
 }
 .gcq-title {
   color: var(--gold);
@@ -99,9 +105,10 @@
 .gcq-start .gcq-btn {
   max-width: 380px;
 }
-/* 주최/주관 로고 — 시작 화면 하단 */
+/* 주최/주관 로고 — 시작 화면 하단 고정 (본문과 최소 간격 유지) */
 .gcq-logos {
-  margin-top: 46px;
+  margin-top: 32px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
