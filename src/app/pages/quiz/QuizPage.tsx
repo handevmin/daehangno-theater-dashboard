@@ -241,6 +241,11 @@ function StartView({ onStart }: { onStart: () => void }) {
         <ChevronRight />
         {META.startButton}
       </button>
+      {/* 주최/주관 로고 */}
+      <div className="gcq-logos">
+        <img className="gcq-logo-sfac" src="/quiz/logo/sfac.png" alt="서울문화재단" />
+        <img className="gcq-logo-dh" src="/quiz/logo/daehakro.png" alt="樂 대학로" />
+      </div>
     </div>
   );
 }

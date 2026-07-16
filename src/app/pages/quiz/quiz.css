@@ -99,6 +99,24 @@
 .gcq-start .gcq-btn {
   max-width: 380px;
 }
+/* 주최/주관 로고 — 시작 화면 하단 */
+.gcq-logos {
+  margin-top: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.gcq-logos img {
+  width: auto;
+  display: block;
+}
+.gcq-logo-sfac {
+  height: 21px;
+}
+.gcq-logo-dh {
+  height: 28px;
+}
 
 /* ══════════ 문항 화면 ══════════ */
 .gcq-quiz {
