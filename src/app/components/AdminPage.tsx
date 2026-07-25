@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import CurationComponent, { type CurationEdit } from "../../imports/추천";
 import { CURATION, emptyPlay, type CurationStore, type CurationContent, type CurationPlay } from "../lib/curation";
+import QuizAdminView from "./QuizAdminView";
 
 const fmtDate = (d: Date) =>
   `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
@@ -38,6 +39,7 @@ const PAGES = [
 type SearchTarget = { page: "seoul" | "ai"; index: number };
 
 export default function AdminPage() {
+  const [tab, setTab] = useState<"curation" | "quiz">("curation");
   const [store, setStore] = useState<CurationStore>(() => JSON.parse(JSON.stringify(CURATION)));
   const [msg, setMsg] = useState("");
   const [saving, setSaving] = useState(false);
@@ -162,20 +164,47 @@ export default function AdminPage() {
 
   const pageHeight = (c: CurationContent) => Math.max(780, 360 + c.plays.length * 250);
 
+  const tabBtn = (t: "curation" | "quiz", label: string): React.CSSProperties => ({
+    padding: "9px 18px",
+    fontSize: 14,
+    fontWeight: 700,
+    border: "none",
+    borderBottom: tab === t ? "3px solid #efba12" : "3px solid transparent",
+    background: "none",
+    color: tab === t ? "#121212" : "#8a8f98",
+    cursor: "pointer",
+  });
+
   return (
     <div style={{ minHeight: "100vh", background: "#eef0f2", fontFamily: "'SUIT', sans-serif", paddingBottom: 90 }}>
       <div style={{ maxWidth: 1500, margin: "0 auto", padding: "20px 24px 0" }}>
-        <h1 style={{ margin: "0 0 4px", fontSize: 24 }}>추천 페이지 관리자</h1>
-        <p style={{ color: "#555", marginTop: 0, fontSize: 14, lineHeight: 1.5 }}>
-          글자를 클릭해 고치면 이 미리보기에서 줄바꿈·줄 수를 바로 확인할 수 있습니다.
-          공연 카드의 <b>KOPIS 검색</b>으로 공연을 고르면 포스터·공연장·기간·러닝타임·나이가 자동 입력됩니다.
-          AI 페이지는 <b>AI 자동 생성</b>으로 오늘의 추천을 불러온 뒤 확인·수정할 수 있습니다.
-          <br />
-          <b>저장하면 편집한 내용이 확정되어, 약 1분 뒤 실제 전시용 추천 화면(슬라이드쇼)에 그대로 반영됩니다.</b>
-        </p>
+        <h1 style={{ margin: "0 0 10px", fontSize: 24 }}>대학로 대시보드 관리자</h1>
+        {/* 탭 */}
+        <div style={{ display: "flex", gap: 6, borderBottom: "1px solid #d9dde2", marginBottom: 16 }}>
+          <button style={tabBtn("curation", "추천 페이지 편집")} onClick={() => setTab("curation")}>
+            추천 페이지 편집
+          </button>
+          <button style={tabBtn("quiz", "극캐감별사 설문")} onClick={() => setTab("quiz")}>
+            극캐감별사 설문
+          </button>
+        </div>
       </div>
 
-      {PAGES.map(({ key, source }) => (
+      {tab === "quiz" && <QuizAdminView />}
+
+      {tab === "curation" && (
+        <div style={{ maxWidth: 1500, margin: "0 auto", padding: "0 24px" }}>
+          <p style={{ color: "#555", marginTop: 0, fontSize: 14, lineHeight: 1.5 }}>
+            글자를 클릭해 고치면 이 미리보기에서 줄바꿈·줄 수를 바로 확인할 수 있습니다.
+            공연 카드의 <b>KOPIS 검색</b>으로 공연을 고르면 포스터·공연장·기간·러닝타임·나이가 자동 입력됩니다.
+            AI 페이지는 <b>AI 자동 생성</b>으로 오늘의 추천을 불러온 뒤 확인·수정할 수 있습니다.
+            <br />
+            <b>저장하면 편집한 내용이 확정되어, 약 1분 뒤 실제 전시용 추천 화면(슬라이드쇼)에 그대로 반영됩니다.</b>
+          </p>
+        </div>
+      )}
+
+      {tab === "curation" && PAGES.map(({ key, source }) => (
         <div key={key} style={{ maxWidth: 1500, margin: "0 auto", padding: "8px 24px 28px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "10px 0 8px", flexWrap: "wrap" }}>
             <span style={{ fontWeight: 700, fontSize: 16 }}>{source}가 추천하는 오늘의 공연</span>
@@ -258,17 +287,19 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* 저장 바 */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #ddd", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 14, zIndex: 100 }}>
-        <span style={{ fontSize: 14, color: msg.includes("실패") ? "#c00" : "#333" }}>{msg}</span>
-        <button
-          onClick={save}
-          disabled={saving}
-          style={{ fontSize: 16, padding: "10px 26px", background: "#121212", color: "#fff", border: "none", borderRadius: 8, cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1 }}
-        >
-          저장
-        </button>
-      </div>
+      {/* 저장 바 — 추천 편집 탭에서만 (설문 탭은 읽기 전용) */}
+      {tab === "curation" && (
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #ddd", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 14, zIndex: 100 }}>
+          <span style={{ fontSize: 14, color: msg.includes("실패") ? "#c00" : "#333" }}>{msg}</span>
+          <button
+            onClick={save}
+            disabled={saving}
+            style={{ fontSize: 16, padding: "10px 26px", background: "#121212", color: "#fff", border: "none", borderRadius: 8, cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1 }}
+          >
+            저장
+          </button>
+        </div>
+      )}
     </div>
   );
 }
