@@ -503,10 +503,9 @@ function RecommendCard({ rec, charName }: { rec: Recommend; charName: string }) 
 }
 
 /* ── 다른 캐릭터 확인하기 — 센터 대시보드 홍보 슬라이드처럼 가운데 강조 카드로 넘겨보기 ── */
-const GAL_CARD_W = 190; // 카드 폭(px)
+const GAL_CARD_W = 240; // 카드 폭(px) — 대사가 한 글자만 넘치는 줄바꿈 방지
 const GAL_GAP = 14;
 const GAL_STEP = GAL_CARD_W + GAL_GAP;
-const GAL_HOLD_MS = 2600; // 카드당 노출
 const GAL_SLIDE_MS = 560; // 전환 시간
 
 function GalleryView({
@@ -525,11 +524,7 @@ function GalleryView({
 
   const go = (d: number) => setActive((a) => a + d);
 
-  // 자동 넘김
-  useEffect(() => {
-    const t = setTimeout(() => setActive((a) => a + 1), GAL_HOLD_MS);
-    return () => clearTimeout(t);
-  }, [active]);
+  // (자동 넘김 없음 — 스와이프/화살표로만 수동 이동)
 
   // 가운데 벌을 벗어나면 전환이 끝난 뒤 애니메이션 없이 원위치로 스냅(무한 순환)
   useEffect(() => {
@@ -582,7 +577,6 @@ function GalleryView({
           }}
         >
           {cards.map((c, i) => {
-            const r = RESULTS[c.key];
             const isActive = i === active;
             return (
               <div
@@ -594,18 +588,7 @@ function GalleryView({
                   <img src={bodyImg(c.key)} alt={c.name} />
                 </div>
                 <div className="gcq-gal-name">{c.name}</div>
-                {isActive ? (
-                  <>
-                    <div className="gcq-gal-quote">
-                      {r.quote.map((l, li) => (
-                        <div key={li}>{l}</div>
-                      ))}
-                    </div>
-                    <div className="gcq-gal-source">{r.source}</div>
-                  </>
-                ) : (
-                  <div className="gcq-gal-desc">{c.title}</div>
-                )}
+                <div className="gcq-gal-desc">{c.title}</div>
               </div>
             );
           })}
