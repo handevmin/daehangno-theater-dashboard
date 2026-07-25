@@ -1,13 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronRight, ChevronLeft, RotateCcw, Share2 } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronLeft,
+  RotateCcw,
+  Share2,
+  Users,
+} from "lucide-react";
 import {
   META,
   QUESTIONS,
   RESULTS,
+  GALLERY,
   computeResult,
   fullImg,
   circleImg,
+  bodyImg,
   COVER_IMG,
+  isCharKey,
   type CharKey,
 } from "./quizData";
 import { fetchDashboard, proxyImg, type PlayItem } from "../../lib/kopis";
@@ -77,18 +86,33 @@ function toRecommend(p: PlayItem | null): Recommend | null {
   };
 }
 
-type Stage = "start" | "quiz" | "loading" | "result";
+type Stage = "start" | "quiz" | "loading" | "result" | "gallery";
+
+// 공유 링크로 들어온 경우(?result=키) 초기 상태 계산 — 결과 화면으로 바로 진입
+function initialFromUrl(): { stage: Stage; forced: CharKey | null } {
+  try {
+    const v = new URLSearchParams(window.location.search).get("result");
+    if (isCharKey(v)) return { stage: "result", forced: v };
+  } catch {
+    /* SSR 등 */
+  }
+  return { stage: "start", forced: null };
+}
 
 export default function QuizPage() {
-  const [stage, setStage] = useState<Stage>("start");
+  const boot = useMemo(initialFromUrl, []);
+  const [stage, setStage] = useState<Stage>(boot.stage);
   const [index, setIndex] = useState(0);
   const [picks, setPicks] = useState<CharKey[]>([]);
+  // 공유 링크로 진입했을 때 강제로 보여줄 결과 캐릭터 (퀴즈를 안 풀었어도 표시)
+  const [forcedResult, setForcedResult] = useState<CharKey | null>(boot.forced);
   const total = QUESTIONS.length;
 
-  // 결과 캐릭터 (로딩/결과 단계에서 확정)
+  // 결과 캐릭터 — 공유 링크의 강제값 우선, 없으면 퀴즈 응답으로 산출
   const resultKey = useMemo<CharKey | null>(
-    () => (picks.length === total ? computeResult(picks) : null),
-    [picks, total],
+    () =>
+      forcedResult ?? (picks.length === total ? computeResult(picks) : null),
+    [forcedResult, picks, total],
   );
 
   // 캐릭터별 추천 공연 —
@@ -157,7 +181,20 @@ export default function QuizPage() {
     window.scrollTo(0, 0);
   }, [stage, index]);
 
+  // 결과/갤러리 화면이면 주소창에 ?result=키 를 반영 → 공유 시 "내 결과 페이지"가 열린다.
+  // 그 외 화면(시작/문항/로딩)에서는 파라미터 제거.
+  useEffect(() => {
+    const onResult = (stage === "result" || stage === "gallery") && resultKey;
+    const url = onResult
+      ? `${window.location.pathname}?result=${resultKey}`
+      : window.location.pathname;
+    if (window.location.pathname + window.location.search !== url) {
+      window.history.replaceState(null, "", url);
+    }
+  }, [stage, resultKey]);
+
   function start() {
+    setForcedResult(null);
     setPicks([]);
     setIndex(0);
     setStage("quiz");
@@ -179,14 +216,20 @@ export default function QuizPage() {
   }
 
   function restart() {
+    setForcedResult(null);
     setPicks([]);
     setIndex(0);
     setStage("start");
   }
 
   async function share() {
-    const url = window.location.href;
-    const text = `${META.title} — ${META.subtitle}`;
+    // 결과 파라미터가 반영된 현재 URL을 공유 → 받는 사람은 내 결과 페이지로 진입
+    const url = resultKey
+      ? `${window.location.origin}${window.location.pathname}?result=${resultKey}`
+      : window.location.href;
+    const text = resultKey
+      ? `${META.title} — 나는 '${RESULTS[resultKey].name}' 유형!`
+      : `${META.title} — ${META.subtitle}`;
     try {
       if (navigator.share) {
         await navigator.share({ title: META.title, text, url });
@@ -223,6 +266,13 @@ export default function QuizPage() {
             recommend={recommend}
             onRestart={restart}
             onShare={share}
+            onGallery={() => setStage("gallery")}
+          />
+        )}
+        {stage === "gallery" && (
+          <GalleryView
+            initialKey={resultKey}
+            onBack={() => setStage("result")}
           />
         )}
       </div>
@@ -327,11 +377,13 @@ function ResultView({
   recommend,
   onRestart,
   onShare,
+  onGallery,
 }: {
   charKey: CharKey;
   recommend: Recommend | null;
   onRestart: () => void;
   onShare: () => void;
+  onGallery: () => void;
 }) {
   const r = RESULTS[charKey];
   return (
@@ -377,6 +429,10 @@ function ResultView({
         <button className="gcq-btn" onClick={onRestart}>
           <RotateCcw />
           {META.restartText}
+        </button>
+        <button className="gcq-btn gcq-btn-ghost" onClick={onGallery}>
+          <Users />
+          다른 캐릭터 확인하기
         </button>
       </div>
     </div>
@@ -425,6 +481,87 @@ function RecommendCard({ rec, charName }: { rec: Recommend; charName: string }) 
           {url && <span className="gcq-rec-cta">예매하러 가기 →</span>}
         </div>
       </Wrapper>
+    </div>
+  );
+}
+
+/* ── 다른 캐릭터 확인하기 — 8종 전신 슬라이더 (센터 대시보드처럼 넘겨보기) ── */
+function GalleryView({
+  initialKey,
+  onBack,
+}: {
+  initialKey: CharKey | null;
+  onBack: () => void;
+}) {
+  const startIdx = Math.max(
+    0,
+    GALLERY.findIndex((g) => g.key === initialKey),
+  );
+  const [idx, setIdx] = useState(startIdx);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  // 진입 시 내 결과 캐릭터로 스크롤(애니메이션 없이)
+  useEffect(() => {
+    const el = trackRef.current;
+    if (el) el.scrollLeft = startIdx * el.clientWidth;
+    // startIdx 는 마운트 시 고정
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const go = (d: number) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const n = (idx + d + GALLERY.length) % GALLERY.length;
+    el.scrollTo({ left: n * el.clientWidth, behavior: "smooth" });
+    setIdx(n);
+  };
+
+  // 스와이프로 넘길 때 현재 인덱스 동기화
+  const onScroll = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    const n = Math.round(el.scrollLeft / el.clientWidth);
+    if (n !== idx) setIdx(n);
+  };
+
+  return (
+    <div className="gcq-gallery">
+      <div className="gcq-gallery-top">
+        <button className="gcq-back" onClick={onBack} aria-label="결과로 돌아가기">
+          <ChevronLeft />
+        </button>
+        <div className="gcq-gallery-title">극 캐릭터 8인</div>
+      </div>
+
+      <div className="gcq-gallery-track" ref={trackRef} onScroll={onScroll}>
+        {GALLERY.map((c) => (
+          <div className="gcq-gallery-slide" key={c.key}>
+            <div className="gcq-gallery-card">
+              <img src={bodyImg(c.key)} alt={c.name} />
+            </div>
+            <div className="gcq-gallery-name">{c.name}</div>
+            <div className="gcq-gallery-desc">{c.title}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="gcq-gallery-nav">
+        <button onClick={() => go(-1)} aria-label="이전 캐릭터">
+          <ChevronLeft />
+        </button>
+        <div className="gcq-gallery-dots">
+          {GALLERY.map((g, i) => (
+            <span key={g.key} className={i === idx ? "on" : ""} />
+          ))}
+        </div>
+        <button onClick={() => go(1)} aria-label="다음 캐릭터">
+          <ChevronRight />
+        </button>
+      </div>
+
+      <button className="gcq-btn gcq-gallery-close" onClick={onBack}>
+        내 결과로 돌아가기
+      </button>
     </div>
   );
 }

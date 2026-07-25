@@ -1,6 +1,5 @@
 // 극캐감별사 — "내가 만약 연극 속 주인공이라면?"
 // smore.im/quiz/dFjTONPgd9 의 문항/결과 데이터를 그대로 옮긴 것.
-// (원본 결과 카피의 오타 "환상이 케미" 포함, 있는 그대로 유지)
 
 export type CharKey =
   | "hamlet" | "macbeth" | "romeo" | "oedipus"
@@ -233,7 +232,7 @@ export const RESULTS: Record<CharKey, CharResult> = {
       " 당신은 타인의 시선이나 사회가 요구하는 역할에 갇히기를 거부하며, 오직 스스로 선택한 길을 개척하고자 하는 독립적인 영혼입니다. 누군가의 부속품으로 살기보다 '진정한 나'를 찾는 여정에 최고의 가치를 두며, 이를 위해 안락한 환경조차 과감히 포기할 수 있는 용기가 있습니다. 변화를 두려워하지 않고 자아를 확장해 나가는 당신의 모습은 주변에 건강한 자극을 줍니다.",
       " 하지만 자아를 찾는 과정에서의 단호함이 자칫 소중한 관계를 단칼에 베어버리거나 주변의 조언을 간섭으로 오해하게 만들 수도 있습니다. 진정한 독립은 고립이 아니라, 타인과 연결된 채로도 나 자신을 잃지 않는 단단함에서 나옵니다. 주변과 소통하며 당신의 자유를 확장해 나가는 법을 익히세요. 당신이 열고 나간 문 밖의 세상은 타인과 함께할 때 더욱 넓고 다채로워질 것입니다.",
     ],
-    chemGood: { label: "환상이 케미", char: "faust" },
+    chemGood: { label: "환상의 케미", char: "faust" },
     chemBad: { label: "파멸의 케미", char: "antigone" },
   },
   oedipus: {
@@ -328,4 +327,22 @@ export function computeResult(picks: CharKey[]): CharKey {
 /** public/quiz 자산 경로 헬퍼 */
 export const fullImg = (k: CharKey) => `/quiz/full/${k}.jpg`;
 export const circleImg = (k: CharKey) => `/quiz/circle/${k}.png`;
+export const bodyImg = (k: CharKey) => `/quiz/body/${k}.png`; // 투명 배경 전신
 export const COVER_IMG = "/quiz/cover.png";
+
+/** "다른 캐릭터 확인하기" 갤러리 — 클라이언트 제공 한 줄 타이틀(순서 고정) */
+export const GALLERY: { key: CharKey; name: string; title: string }[] = [
+  { key: "hamlet", name: "햄릿", title: "신중하고 깊이 있는 사색가" },
+  { key: "macbeth", name: "맥베스", title: "야망으로 불타는 열정적인 승부사" },
+  { key: "romeo", name: "로미오", title: "순수하고 뜨거운 로맨티스트" },
+  { key: "oedipus", name: "오이디푸스", title: "진실을 향해 나아가는 탐구자" },
+  { key: "nora", name: "노라", title: "주체적인 삶을 개척하는 독립가" },
+  { key: "antigone", name: "안티고네", title: "단단하고 고결한 신념가" },
+  { key: "falstaff", name: "팔스타프", title: "현재를 즐기는 감각주의자" },
+  { key: "faust", name: "파우스트", title: "한계를 넘어서는 초월자" },
+];
+
+/** URL 공유용: 문자열이 유효한 캐릭터 키인지 */
+export function isCharKey(v: string | null): v is CharKey {
+  return !!v && GALLERY.some((g) => g.key === v);
+}

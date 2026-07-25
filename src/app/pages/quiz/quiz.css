@@ -502,6 +502,139 @@ a.gcq-rec-card:active {
   gap: 14px;
   padding: 30px 26px 46px;
 }
+/* 보조(고스트) 버튼 — 흰 배경 + 골드 테두리 */
+.gcq-btn-ghost {
+  background: #fff;
+  color: var(--gold-bottom);
+  border: 2px solid var(--gold);
+  box-shadow: 0 8px 18px -12px rgba(239, 186, 18, 0.5);
+}
+.gcq-btn-ghost:hover {
+  filter: none;
+  background: #fffdf5;
+}
+
+/* ── 다른 캐릭터 확인하기 (전신 슬라이더) ── */
+.gcq-gallery {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #fafafa;
+}
+.gcq-gallery-top {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 20px 6px;
+}
+.gcq-gallery-top .gcq-back {
+  position: absolute;
+  left: 20px;
+}
+.gcq-gallery-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.gcq-gallery-track {
+  flex: 1;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.gcq-gallery-track::-webkit-scrollbar {
+  display: none;
+}
+.gcq-gallery-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 26px 4px;
+}
+.gcq-gallery-card {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(180deg, #f1efe9, #e8e5de);
+  border-radius: 24px;
+  border: 2.5px solid #121212;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.gcq-gallery-card img {
+  width: 92%;
+  height: 92%;
+  object-fit: contain;
+}
+.gcq-gallery-name {
+  margin-top: 20px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.gcq-gallery-desc {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #5a5a5a;
+  text-align: center;
+}
+.gcq-gallery-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 14px 0 4px;
+}
+.gcq-gallery-nav button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--gold-top), var(--gold-bottom));
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 12px -6px rgba(239, 186, 18, 0.7);
+}
+.gcq-gallery-nav button svg {
+  width: 18px;
+  height: 18px;
+}
+.gcq-gallery-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.gcq-gallery-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #dcdcdc;
+  transition: all 0.2s ease;
+}
+.gcq-gallery-dots span.on {
+  width: 20px;
+  border-radius: 999px;
+  background: var(--gold);
+}
+.gcq-gallery-close {
+  margin: 12px 26px 40px;
+  width: calc(100% - 52px);
+}
 
 /* 작은 화면 대응 */
 @media (max-width: 360px) {
