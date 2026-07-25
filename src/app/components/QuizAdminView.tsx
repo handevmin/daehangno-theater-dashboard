@@ -94,11 +94,7 @@ export default function QuizAdminView() {
   const order: CharKey[] = GALLERY.map((g) => g.key);
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "4px 24px 90px", fontFamily: "'SUIT', sans-serif" }}>
-      <p style={{ color: "#555", fontSize: 13, lineHeight: 1.6, marginTop: 0 }}>
-        문항·결과 <b>텍스트</b>를 고칠 수 있습니다. 캐릭터 배점(어느 보기가 어느 캐릭터인지)은 고정이라 배지로만 표시됩니다.
-      </p>
-
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "12px 24px 90px", fontFamily: "'SUIT', sans-serif" }}>
       {/* 기본 문구 */}
       <div style={{ ...card, padding: 16, marginBottom: 18 }}>
         <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>기본 문구</div>
