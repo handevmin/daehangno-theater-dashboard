@@ -174,6 +174,23 @@ export default function QuizPage() {
     return () => clearTimeout(t);
   }, [stage]);
 
+  // 참여 통계 집계 — 실제로 퀴즈를 풀어 결과에 도달했을 때 1건 기록.
+  // (공유 링크 ?result= 로 들어온 경우는 forcedResult 라서 집계 제외). 세션당 1회.
+  const loggedRef = useRef(false);
+  useEffect(() => {
+    if (stage === "result" && !forcedResult && resultKey && !loggedRef.current) {
+      loggedRef.current = true;
+      fetch("/api/quiz-stat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ result: resultKey }),
+        keepalive: true,
+      }).catch(() => {
+        /* 집계 실패는 사용자 경험에 영향 없음 */
+      });
+    }
+  }, [stage, forcedResult, resultKey]);
+
   // 단계가 바뀌면 스크롤 최상단
   const scrollTop = useRef<HTMLDivElement>(null);
   useEffect(() => {

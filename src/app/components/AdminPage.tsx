@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CurationComponent, { type CurationEdit } from "../../imports/추천";
 import { CURATION, emptyPlay, type CurationStore, type CurationContent, type CurationPlay } from "../lib/curation";
 import QuizAdminView from "./QuizAdminView";
+import QuizStatsView from "./QuizStatsView";
 
 const fmtDate = (d: Date) =>
   `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
@@ -39,7 +40,7 @@ const PAGES = [
 type SearchTarget = { page: "seoul" | "ai"; index: number };
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<"curation" | "quiz">("curation");
+  const [tab, setTab] = useState<"curation" | "quiz" | "stats">("curation");
   const [store, setStore] = useState<CurationStore>(() => JSON.parse(JSON.stringify(CURATION)));
   const [msg, setMsg] = useState("");
   const [saving, setSaving] = useState(false);
@@ -164,7 +165,7 @@ export default function AdminPage() {
 
   const pageHeight = (c: CurationContent) => Math.max(780, 360 + c.plays.length * 250);
 
-  const tabBtn = (t: "curation" | "quiz", label: string): React.CSSProperties => ({
+  const tabBtn = (t: "curation" | "quiz" | "stats", label: string): React.CSSProperties => ({
     padding: "9px 18px",
     fontSize: 14,
     fontWeight: 700,
@@ -187,10 +188,14 @@ export default function AdminPage() {
           <button style={tabBtn("quiz", "극캐감별사 설문")} onClick={() => setTab("quiz")}>
             극캐감별사 설문
           </button>
+          <button style={tabBtn("stats", "극캐감별사 참여 통계")} onClick={() => setTab("stats")}>
+            극캐감별사 참여 통계
+          </button>
         </div>
       </div>
 
       {tab === "quiz" && <QuizAdminView />}
+      {tab === "stats" && <QuizStatsView />}
 
       {tab === "curation" && (
         <div style={{ maxWidth: 1500, margin: "0 auto", padding: "0 24px" }}>
