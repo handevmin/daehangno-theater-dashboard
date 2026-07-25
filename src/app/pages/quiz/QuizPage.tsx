@@ -502,7 +502,13 @@ function RecommendCard({ rec, charName }: { rec: Recommend; charName: string }) 
   );
 }
 
-/* ── 다른 캐릭터 확인하기 — 8종 전신 슬라이더 (센터 대시보드처럼 넘겨보기) ── */
+/* ── 다른 캐릭터 확인하기 — 센터 대시보드 홍보 슬라이드처럼 가운데 강조 카드로 넘겨보기 ── */
+const GAL_CARD_W = 190; // 카드 폭(px)
+const GAL_GAP = 14;
+const GAL_STEP = GAL_CARD_W + GAL_GAP;
+const GAL_HOLD_MS = 2600; // 카드당 노출
+const GAL_SLIDE_MS = 560; // 전환 시간
+
 function GalleryView({
   initialKey,
   onBack,
@@ -510,36 +516,51 @@ function GalleryView({
   initialKey: CharKey | null;
   onBack: () => void;
 }) {
-  const startIdx = Math.max(
-    0,
-    GALLERY.findIndex((g) => g.key === initialKey),
-  );
-  const [idx, setIdx] = useState(startIdx);
-  const trackRef = useRef<HTMLDivElement>(null);
+  const N = GALLERY.length;
+  const startIdx = Math.max(0, GALLERY.findIndex((g) => g.key === initialKey));
+  // 3벌 반복 → 가운데 벌에서 시작해 좌우로 무한 순환
+  const [active, setActive] = useState(N + startIdx);
+  const [anim, setAnim] = useState(true);
+  const touchX = useRef<number | null>(null);
 
-  // 진입 시 내 결과 캐릭터로 스크롤(애니메이션 없이)
+  const go = (d: number) => setActive((a) => a + d);
+
+  // 자동 넘김
   useEffect(() => {
-    const el = trackRef.current;
-    if (el) el.scrollLeft = startIdx * el.clientWidth;
-    // startIdx 는 마운트 시 고정
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const t = setTimeout(() => setActive((a) => a + 1), GAL_HOLD_MS);
+    return () => clearTimeout(t);
+  }, [active]);
 
-  const go = (d: number) => {
-    const el = trackRef.current;
-    if (!el) return;
-    const n = (idx + d + GALLERY.length) % GALLERY.length;
-    el.scrollTo({ left: n * el.clientWidth, behavior: "smooth" });
-    setIdx(n);
+  // 가운데 벌을 벗어나면 전환이 끝난 뒤 애니메이션 없이 원위치로 스냅(무한 순환)
+  useEffect(() => {
+    if (active >= 2 * N || active < N) {
+      const t = setTimeout(() => {
+        setAnim(false);
+        setActive((a) => (a >= 2 * N ? a - N : a + N));
+      }, GAL_SLIDE_MS);
+      return () => clearTimeout(t);
+    }
+  }, [active, N]);
+  useEffect(() => {
+    if (anim) return;
+    const r = requestAnimationFrame(() =>
+      requestAnimationFrame(() => setAnim(true)),
+    );
+    return () => cancelAnimationFrame(r);
+  }, [anim]);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX.current = null;
   };
 
-  // 스와이프로 넘길 때 현재 인덱스 동기화
-  const onScroll = () => {
-    const el = trackRef.current;
-    if (!el) return;
-    const n = Math.round(el.scrollLeft / el.clientWidth);
-    if (n !== idx) setIdx(n);
-  };
+  const cards = [...GALLERY, ...GALLERY, ...GALLERY];
+  const activeMod = ((active % N) + N) % N;
 
   return (
     <div className="gcq-gallery">
@@ -547,19 +568,48 @@ function GalleryView({
         <button className="gcq-back" onClick={onBack} aria-label="결과로 돌아가기">
           <ChevronLeft />
         </button>
-        <div className="gcq-gallery-title">극 캐릭터 8인</div>
+        <div className="gcq-gallery-title">다른 캐릭터</div>
       </div>
 
-      <div className="gcq-gallery-track" ref={trackRef} onScroll={onScroll}>
-        {GALLERY.map((c) => (
-          <div className="gcq-gallery-slide" key={c.key}>
-            <div className="gcq-gallery-card">
-              <img src={bodyImg(c.key)} alt={c.name} />
-            </div>
-            <div className="gcq-gallery-name">{c.name}</div>
-            <div className="gcq-gallery-desc">{c.title}</div>
-          </div>
-        ))}
+      <div className="gcq-gal-stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <div
+          className="gcq-gal-track"
+          style={{
+            transform: `translate(${-(active * GAL_STEP + GAL_CARD_W / 2)}px, -50%)`,
+            transition: anim
+              ? `transform ${GAL_SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`
+              : "none",
+          }}
+        >
+          {cards.map((c, i) => {
+            const r = RESULTS[c.key];
+            const isActive = i === active;
+            return (
+              <div
+                key={i}
+                className={`gcq-gal-card${isActive ? " active" : ""}`}
+                onClick={() => !isActive && setActive(i)}
+              >
+                <div className="gcq-gal-fig">
+                  <img src={bodyImg(c.key)} alt={c.name} />
+                </div>
+                <div className="gcq-gal-name">{c.name}</div>
+                {isActive ? (
+                  <>
+                    <div className="gcq-gal-quote">
+                      {r.quote.map((l, li) => (
+                        <div key={li}>{l}</div>
+                      ))}
+                    </div>
+                    <div className="gcq-gal-source">{r.source}</div>
+                  </>
+                ) : (
+                  <div className="gcq-gal-desc">{c.title}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="gcq-gallery-nav">
@@ -568,7 +618,7 @@ function GalleryView({
         </button>
         <div className="gcq-gallery-dots">
           {GALLERY.map((g, i) => (
-            <span key={g.key} className={i === idx ? "on" : ""} />
+            <span key={g.key} className={i === activeMod ? "on" : ""} />
           ))}
         </div>
         <button onClick={() => go(1)} aria-label="다음 캐릭터">
