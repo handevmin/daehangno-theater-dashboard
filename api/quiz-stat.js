@@ -8,10 +8,27 @@ const CHAR_KEYS = ['hamlet', 'macbeth', 'romeo', 'oedipus', 'nora', 'antigone', 
 const TOTAL_KEY = 'quiz:total'
 const BYCHAR_KEY = 'quiz:byChar'
 
+// Vercel KV / Upstash / 유사 통합이 주입하는 REST 환경변수 후보 (앞에서부터 우선)
+const URL_KEYS = ['KV_REST_API_URL', 'UPSTASH_REDIS_REST_URL', 'REDIS_REST_API_URL', 'STORAGE_REST_API_URL']
+const TOKEN_KEYS = ['KV_REST_API_TOKEN', 'UPSTASH_REDIS_REST_TOKEN', 'REDIS_REST_API_TOKEN', 'STORAGE_REST_API_TOKEN']
+
+function pick(keys) {
+  for (const k of keys) {
+    const v = process.env[k]
+    if (v) return { key: k, val: v }
+  }
+  return { key: '', val: '' }
+}
 function kvEnv() {
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || ''
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || ''
-  return { url: url.replace(/\/$/, ''), token }
+  const u = pick(URL_KEYS)
+  const t = pick(TOKEN_KEYS)
+  return { url: (u.val || '').replace(/\/$/, ''), token: t.val || '', urlKey: u.key, tokenKey: t.key }
+}
+// 진단용: REST URL/TOKEN 처럼 보이는 환경변수 이름만 수집(값은 노출 안 함)
+function envSeen() {
+  return Object.keys(process.env)
+    .filter((k) => /(REST_API_(URL|TOKEN))$/.test(k) || /^(KV_|UPSTASH_|REDIS_)/.test(k))
+    .sort()
 }
 
 // Upstash REST 파이프라인 호출 → 각 명령의 result 배열 반환
@@ -70,7 +87,8 @@ export default async function handler(req, res) {
     // GET — 집계 조회
     if (!configured) {
       res.statusCode = 200
-      return res.end(JSON.stringify({ configured: false, total: 0, byChar: {} }))
+      // 미설정 시: 감지된 관련 환경변수 이름을 함께 반환(진단용, 값 노출 안 함)
+      return res.end(JSON.stringify({ configured: false, total: 0, byChar: {}, envSeen: envSeen() }))
     }
     const [total, hash] = await kvPipeline([
       ['GET', TOTAL_KEY],

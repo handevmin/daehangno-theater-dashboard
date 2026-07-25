@@ -9,6 +9,7 @@ interface Stat {
   configured: boolean;
   total: number;
   byChar: Record<string, number>;
+  envSeen?: string[];
 }
 
 export default function QuizStatsView() {
@@ -61,6 +62,9 @@ export default function QuizStatsView() {
           </ol>
           <div style={{ marginTop: 8, fontSize: 12.5, color: "#8a7a3a" }}>
             연결 전에도 퀴즈는 정상 동작하며, 집계만 되지 않습니다.
+            {stat.envSeen && stat.envSeen.length > 0 && (
+              <div style={{ marginTop: 6 }}>감지된 저장소 환경변수: <code>{stat.envSeen.join(", ")}</code></div>
+            )}
           </div>
         </div>
       )}
