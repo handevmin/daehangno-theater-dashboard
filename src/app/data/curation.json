@@ -34,16 +34,16 @@
     ]
   },
   "ai": {
-    "hashtag": "여름의 향기",
-    "moodTitle": "작은 더위",
-    "moodDesc": "소서 앞두고 무더위 시작,\n극장에서 시원한 연극으로\n더위를 잊어보세요.",
-    "vibe": "여름 · 시원",
+    "hashtag": "한여름 연극",
+    "moodTitle": "여름의 절정",
+    "moodDesc": "대서의 무더위에 맞춰\n시원한 극장에서 즐기는\n연극으로 더위를 식히세요.",
+    "vibe": "여름 · 무더위",
     "tags": [
-      "여름",
-      "시원함",
+      "대서",
+      "무더위",
       "연극",
       "대학로",
-      "소서"
+      "실내"
     ],
     "plays": [
       {
@@ -54,17 +54,17 @@
         "runtime": "1시간 55분",
         "age": "17",
         "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF292095_260522_163412.jpg",
-        "quote": "무더위를 잊게 할 강렬한 스토리"
+        "quote": "대서의 더위 속 한적한 사랑 이야기"
       },
       {
-        "title": "언체인",
-        "venue": "예스24 스테이지(구. DCF대명문화공장) (2관)",
-        "from": "2026.06.16",
-        "to": "2026.07.26",
-        "runtime": "1시간 20분",
-        "age": "17",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF291279_260513_130938.jpg",
-        "quote": "여름 밤의 긴장감을 더해줄 연극"
+        "title": "이올라오스 [대학로]",
+        "venue": "예스24아트원(구.대학로아트원씨어터) (3관)",
+        "from": "2026.06.21",
+        "to": "2026.09.06",
+        "runtime": "1시간 30분",
+        "age": "15",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF291576_260518_104113.jpg",
+        "quote": "대서의 무더위 속 긴장감 넘치는 전개"
       }
     ]
   }
