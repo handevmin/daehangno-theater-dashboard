@@ -34,37 +34,37 @@
     ]
   },
   "ai": {
-    "hashtag": "한여름 연극",
-    "moodTitle": "여름의 절정",
-    "moodDesc": "대서의 무더위에 맞춰\n시원한 극장에서 즐기는\n연극으로 더위를 식히세요.",
-    "vibe": "여름 · 무더위",
+    "hashtag": "한여름의 무대",
+    "moodTitle": "뜨거운 감성",
+    "moodDesc": "대서의 뜨거움을 무대에서\n느껴보세요. 한여름의 절정\n속 감동적인 공연들입니다.",
+    "vibe": "감동 · 무더위",
     "tags": [
       "대서",
-      "무더위",
-      "연극",
-      "대학로",
-      "실내"
+      "한여름",
+      "감동",
+      "무대",
+      "연극"
     ],
     "plays": [
       {
-        "title": "브로크백 마운틴 [대학로]",
-        "venue": "예스24아트원(구.대학로아트원씨어터) (1관)",
-        "from": "2026.06.23",
-        "to": "2026.09.06",
-        "runtime": "1시간 55분",
-        "age": "17",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF292095_260522_163412.jpg",
-        "quote": "대서의 더위 속 한적한 사랑 이야기"
+        "title": "더 헬멧",
+        "venue": "홍익대 대학로 아트센터 (소극장)",
+        "from": "2026.07.09",
+        "to": "2026.10.11",
+        "runtime": "1시간 10분",
+        "age": "14",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF292342_260527_133223.gif",
+        "quote": "대서의 절정, 무대 위 뜨거운 감동"
       },
       {
-        "title": "이올라오스 [대학로]",
-        "venue": "예스24아트원(구.대학로아트원씨어터) (3관)",
-        "from": "2026.06.21",
-        "to": "2026.09.06",
-        "runtime": "1시간 30분",
-        "age": "15",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF291576_260518_104113.jpg",
-        "quote": "대서의 무더위 속 긴장감 넘치는 전개"
+        "title": "나의 장례식",
+        "venue": "올래홀 (올래홀)",
+        "from": "2026.07.15",
+        "to": "2026.10.05",
+        "runtime": "1시간 40분",
+        "age": "8",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF294028_260618_143825.gif",
+        "quote": "큰 더위 속 잔잔한 감동을 선사"
       }
     ]
   }
