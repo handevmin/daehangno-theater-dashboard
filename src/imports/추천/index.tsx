@@ -958,7 +958,7 @@ export default function Component({
     <div className="bg-[#f7f8f9] relative size-full" data-name="연극1~5">
       <Frame />
       {/* 서울문화재단 심볼 (좌측 레일 상단) */}
-      <img src="/brand/sfac-symbol.png" alt="서울문화재단" className="absolute left-[14px] top-[16px] w-[90px] z-[20] pointer-events-none" />
+      <img src="/brand/sfac-symbol.png" alt="서울문화재단" className="absolute left-[14px] top-[10px] w-[90px] z-[20] pointer-events-none" />
       <Frame3 source={source} />
       <DContents content={content} edit={edit} />
     </div>

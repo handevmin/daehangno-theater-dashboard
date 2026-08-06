@@ -277,7 +277,7 @@ export function TopPlaysScreen({
     <div className="bg-[#f7f8f9] relative size-full">
       <Frame active={activeNode} />
       {/* 서울문화재단 심볼 (좌측 레일 상단) */}
-      <img src="/brand/sfac-symbol.png" alt="서울문화재단" className="absolute left-[14px] top-[16px] w-[90px] z-[20] pointer-events-none" />
+      <img src="/brand/sfac-symbol.png" alt="서울문화재단" className="absolute left-[14px] top-[10px] w-[90px] z-[20] pointer-events-none" />
       <p className="[word-break:break-word] absolute font-['Elice_DigitalBaeum_OTF:Bold',sans-serif] leading-[normal] left-[159px] not-italic text-[#21201c] text-[40px] top-[20px] whitespace-nowrap">{title}</p>
       <div className="absolute h-0 left-[137px] top-[104px] w-[1283px]">
         <div className="absolute inset-[-3px_0_0_0]">

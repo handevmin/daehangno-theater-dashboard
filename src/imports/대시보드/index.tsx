@@ -287,7 +287,7 @@ export default function Component({ data }: { data: DashboardData }) {
       <TodaySeatsBox todaySeats={data.todaySeats} deltaPct={data.weekDeltaPct} />
       <Frame />
       {/* 서울문화재단 심볼 (좌측 레일 상단) */}
-      <img src="/brand/sfac-symbol.png" alt="서울문화재단" className="absolute left-[14px] top-[16px] w-[90px] z-[20] pointer-events-none" />
+      <img src="/brand/sfac-symbol.png" alt="서울문화재단" className="absolute left-[14px] top-[10px] w-[90px] z-[20] pointer-events-none" />
       <Weekly data={data} />
       <WeeklyTrendChart data={data} />
       <DayOfWeekChart data={data} />
