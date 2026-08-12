@@ -34,38 +34,37 @@
     ]
   },
   "ai": {
-    "hashtag": "시작의변화",
-    "moodTitle": "변화의 서막",
-    "moodDesc": "입추를 앞두고 가을의 시작과\n변화를 담은 공연을 만나보세요.",
-    "vibe": "변화 · 시작",
+    "hashtag": "가을의 숨결",
+    "moodTitle": "시작의 기미",
+    "moodDesc": "입추를 맞아 가을의 서늘함을\n느낄 수 있는 연극 두 편을\n추천합니다.",
+    "vibe": "잔잔 · 감동",
     "tags": [
       "입추",
-      "변화",
-      "시작",
       "가을",
-      "마음",
-      "연극"
+      "서늘함",
+      "연극",
+      "감동"
     ],
     "plays": [
       {
-        "title": "쇄골에 천사가 잠들고 있다 [대학로]",
-        "venue": "예그린씨어터 (예그린씨어터)",
-        "from": "2026.07.30",
-        "to": "2026.09.27",
-        "runtime": "1시간 50분",
-        "age": "16",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF294932_260630_110953.jpg",
-        "quote": "입추를 맞아 변화를 그리는 작품입니다"
+        "title": "공부의 신 [대학로]",
+        "venue": "업스테이지 (UP Stage) (업스테이지 (UP Stage) )",
+        "from": "2026.08.07",
+        "to": "2026.08.30",
+        "runtime": "1시간 10분",
+        "age": "8",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF294927_260630_105831.gif",
+        "quote": "입추의 시작에 맞춰 새로운 시작을."
       },
       {
-        "title": "꽃, 별이 지나 [대학로]",
-        "venue": "NOL 서경스퀘어(구. 서경대학교 공연예술센터) (스콘1관)",
-        "from": "2026.06.16",
-        "to": "2026.08.23",
+        "title": "서울의 별 [대학로]",
+        "venue": "대학로 스타릿홀 (공연장)",
+        "from": "2026.07.31",
+        "to": "2026.10.18",
         "runtime": "1시간 40분",
-        "age": "14",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF291582_260624_111354.gif",
-        "quote": "가을의 시작을 꽃과 함께 느껴보세요"
+        "age": "13",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF295991_260713_171114.gif",
+        "quote": "가을 하늘을 닮은 서울의 별처럼."
       }
     ]
   }
