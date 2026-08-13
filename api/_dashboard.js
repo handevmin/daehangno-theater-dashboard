@@ -2,6 +2,7 @@
 // 대학로 필터: boxoffice(서울·연극) 예매순위 → 각 공연 상세조회(daehakro=Y)만 추려 재순위.
 // 차트(공스피/요일별): KOPIS 집계는 전국·연극 단위만 제공되므로 연극 전국 기준 실데이터를 사용한다.
 import { fetchKopisJson } from './_kopis.js'
+import { logSeen } from './_kv.js'
 
 const GENRE_PLAY = 'AAAA' // 연극
 const AREA_SEOUL = '11' // 서울
@@ -426,6 +427,13 @@ export async function buildDashboard() {
 export async function handleDashboard(req, res) {
   try {
     const payload = await buildDashboard()
+    // 공스피에 등장한(소개된) 연극 누적 집계 — top·소극장·곧공연 목록의 중복 없는 mt20id
+    const seenIds = [
+      ...(payload.top || []),
+      ...(payload.smallTop || []),
+      ...(payload.upcoming || []),
+    ].map((p) => p && p.mt20id)
+    await logSeen('dash', seenIds)
     res.statusCode = 200
     res.setHeader('Content-Type', 'application/json; charset=utf-8')
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=3600')

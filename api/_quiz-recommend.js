@@ -2,6 +2,7 @@
 // 8개 캐릭터 유형 각각에 어울리는 연극을 배정하고, 그 날 하루 동안 고정한다.
 // (날짜 키 메모리 캐시 + CDN 캐시로 OpenAI 호출을 하루 1~2회로 억제)
 import { getDaehakroPool, fmt, addDays } from './_dashboard.js'
+import { logSeen } from './_kv.js'
 
 // 8개 캐릭터 유형과 성향 요약 (GPT 배정 근거)
 const CHARS = [
@@ -119,6 +120,8 @@ export async function buildQuizRecommend() {
   CHARS.forEach((ch, i) => {
     if (!map[ch.key]) map[ch.key] = playFields(candidates[i % candidates.length], '')
   })
+  // 극캐에서 추천된 공연 누적 집계 (하루 1회 빌드 시점 = 그날 추천 8편)
+  await logSeen('quiz', Object.values(map).map((v) => v.mt20id))
   return { date, map }
 }
 
