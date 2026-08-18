@@ -12,7 +12,13 @@ interface Stat {
   envSeen?: string[];
 }
 
-export default function QuizStatsView() {
+export default function QuizStatsView({
+  reloadKey,
+  hideRefresh,
+}: {
+  reloadKey?: number;
+  hideRefresh?: boolean;
+} = {}) {
   const [stat, setStat] = useState<Stat | null>(null);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
@@ -26,7 +32,9 @@ export default function QuizStatsView() {
       .catch((e) => setErr(String(e?.message || e)))
       .finally(() => setLoading(false));
   };
-  useEffect(load, []);
+  // 최초 + 외부 새로고침(reloadKey 변경) 시 재조회
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, [reloadKey]);
 
   const rows = GALLERY.map((g) => ({
     key: g.key as CharKey,
@@ -38,15 +46,17 @@ export default function QuizStatsView() {
   const max = Math.max(1, ...rows.map((r) => r.count));
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "4px 24px 60px", fontFamily: "'SUIT', sans-serif" }}>
+    <div style={{ maxWidth: 980, margin: "0 auto", padding: "4px 24px 60px", fontFamily: "'SUIT', sans-serif" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-        <h2 style={{ fontSize: 18, margin: 0 }}>참여 통계</h2>
-        <button
-          onClick={load}
-          style={{ fontSize: 13, padding: "5px 12px", border: "1px solid #ccc", borderRadius: 6, background: "#fff", cursor: "pointer" }}
-        >
-          새로고침
-        </button>
+        <h2 style={{ fontSize: 18, margin: 0 }}>극캐감별사 참여 통계</h2>
+        {!hideRefresh && (
+          <button
+            onClick={load}
+            style={{ fontSize: 13, padding: "5px 12px", border: "1px solid #ccc", borderRadius: 6, background: "#fff", cursor: "pointer" }}
+          >
+            새로고침
+          </button>
+        )}
         {loading && <span style={{ fontSize: 13, color: "#999" }}>불러오는 중…</span>}
       </div>
 

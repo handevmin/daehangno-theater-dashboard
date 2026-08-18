@@ -155,7 +155,13 @@ function TrendChart({ dash, quiz }: { dash: SeenNs; quiz: SeenNs }) {
   );
 }
 
-export default function SeenStatsView() {
+export default function SeenStatsView({
+  reloadKey,
+  onRefresh,
+}: {
+  reloadKey?: number;
+  onRefresh?: () => void;
+} = {}) {
   const [stat, setStat] = useState<SeenStat | null>(null);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
@@ -169,7 +175,9 @@ export default function SeenStatsView() {
       .catch((e) => setErr(String(e?.message || e)))
       .finally(() => setLoading(false));
   };
-  useEffect(load, []);
+  // 최초 + 외부 새로고침(reloadKey 변경) 시 재조회
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, [reloadKey]);
 
   const dashD = stat ? derive(stat.dashboard) : null;
   const quizD = stat ? derive(stat.quiz) : null;
@@ -195,7 +203,7 @@ export default function SeenStatsView() {
           </p>
         </div>
         <button
-          onClick={load}
+          onClick={onRefresh ?? load}
           disabled={loading}
           style={{
             fontSize: 13,

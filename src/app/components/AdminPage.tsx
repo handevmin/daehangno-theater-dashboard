@@ -42,6 +42,7 @@ type SearchTarget = { page: "seoul" | "ai"; index: number };
 
 export default function AdminPage() {
   const [tab, setTab] = useState<"curation" | "quiz" | "insights">("curation");
+  const [reloadKey, setReloadKey] = useState(0); // 통계·인사이트 통합 새로고침
   const [store, setStore] = useState<CurationStore>(() => JSON.parse(JSON.stringify(CURATION)));
   const [msg, setMsg] = useState("");
   const [saving, setSaving] = useState(false);
@@ -198,11 +199,11 @@ export default function AdminPage() {
       {tab === "quiz" && <QuizAdminView />}
       {tab === "insights" && (
         <div>
-          <SeenStatsView />
+          <SeenStatsView reloadKey={reloadKey} onRefresh={() => setReloadKey((k) => k + 1)} />
           <div style={{ maxWidth: 980, margin: "6px auto 0", padding: "0 24px" }}>
             <div style={{ borderTop: "1px solid #e2e5e9" }} />
           </div>
-          <QuizStatsView />
+          <QuizStatsView reloadKey={reloadKey} hideRefresh />
         </div>
       )}
 
