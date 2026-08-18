@@ -44,12 +44,14 @@ function Tile({
   accent,
   icon,
   sub,
+  unit = "편",
 }: {
   label: string;
   value: number;
   accent: string;
   icon: string;
   sub: React.ReactNode;
+  unit?: string;
 }) {
   return (
     <div
@@ -85,7 +87,7 @@ function Tile({
         <span style={{ fontSize: 44, fontWeight: 800, color: "#1c1f24", lineHeight: 1, letterSpacing: -1 }}>
           {value.toLocaleString()}
         </span>
-        <span style={{ fontSize: 15, fontWeight: 700, color: "#8a8f98" }}>편</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "#8a8f98" }}>{unit}</span>
       </div>
       <div style={{ marginTop: 10, fontSize: 12.5, color: "#7a808a" }}>{sub}</div>
     </div>
@@ -274,6 +276,7 @@ export default function SeenStatsView() {
               value={periodMonths}
               accent="#7b61ff"
               icon="📈"
+              unit="개월"
               sub={
                 <>
                   개월간 집계 · 공스피 <b style={{ color: "#1c1f24" }}>월 {dashD.avg}편</b>
