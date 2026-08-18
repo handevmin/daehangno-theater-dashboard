@@ -41,7 +41,7 @@ const PAGES = [
 type SearchTarget = { page: "seoul" | "ai"; index: number };
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<"curation" | "quiz" | "stats" | "seen">("curation");
+  const [tab, setTab] = useState<"curation" | "quiz" | "insights">("curation");
   const [store, setStore] = useState<CurationStore>(() => JSON.parse(JSON.stringify(CURATION)));
   const [msg, setMsg] = useState("");
   const [saving, setSaving] = useState(false);
@@ -166,7 +166,7 @@ export default function AdminPage() {
 
   const pageHeight = (c: CurationContent) => Math.max(780, 360 + c.plays.length * 250);
 
-  const tabBtn = (t: "curation" | "quiz" | "stats" | "seen", label: string): React.CSSProperties => ({
+  const tabBtn = (t: "curation" | "quiz" | "insights", label: string): React.CSSProperties => ({
     padding: "9px 18px",
     fontSize: 14,
     fontWeight: 700,
@@ -189,18 +189,22 @@ export default function AdminPage() {
           <button style={tabBtn("quiz", "극캐감별사 설문")} onClick={() => setTab("quiz")}>
             극캐감별사 설문
           </button>
-          <button style={tabBtn("stats", "극캐감별사 참여 통계")} onClick={() => setTab("stats")}>
-            극캐감별사 참여 통계
-          </button>
-          <button style={tabBtn("seen", "누적 소개 연극")} onClick={() => setTab("seen")}>
-            누적 소개 연극
+          <button style={tabBtn("insights", "통계 · 인사이트")} onClick={() => setTab("insights")}>
+            통계 · 인사이트
           </button>
         </div>
       </div>
 
       {tab === "quiz" && <QuizAdminView />}
-      {tab === "seen" && <SeenStatsView />}
-      {tab === "stats" && <QuizStatsView />}
+      {tab === "insights" && (
+        <div>
+          <SeenStatsView />
+          <div style={{ maxWidth: 980, margin: "6px auto 0", padding: "0 24px" }}>
+            <div style={{ borderTop: "1px solid #e2e5e9" }} />
+          </div>
+          <QuizStatsView />
+        </div>
+      )}
 
       {tab === "curation" && (
         <div style={{ maxWidth: 1500, margin: "0 auto", padding: "0 24px" }}>

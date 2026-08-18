@@ -42,49 +42,28 @@ function Tile({
   label,
   value,
   accent,
-  icon,
   sub,
   unit = "편",
 }: {
   label: string;
   value: number;
   accent: string;
-  icon: string;
   sub: React.ReactNode;
   unit?: string;
 }) {
   return (
     <div
       style={{
-        position: "relative",
         background: "#fff",
         border: "1px solid #e8ebef",
         borderRadius: 16,
         padding: "18px 20px",
         boxShadow: "0 6px 20px -12px rgba(0,0,0,0.18)",
-        overflow: "hidden",
       }}
     >
-      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 5, background: accent }} />
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 9,
-            background: accent + "22",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 16,
-          }}
-        >
-          {icon}
-        </span>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#5b616b" }}>{label}</span>
-      </div>
+      <span style={{ fontSize: 13, fontWeight: 700, color: "#5b616b" }}>{label}</span>
       <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 12 }}>
-        <span style={{ fontSize: 44, fontWeight: 800, color: "#1c1f24", lineHeight: 1, letterSpacing: -1 }}>
+        <span style={{ fontSize: 44, fontWeight: 800, color: accent, lineHeight: 1, letterSpacing: -1 }}>
           {value.toLocaleString()}
         </span>
         <span style={{ fontSize: 15, fontWeight: 700, color: "#8a8f98" }}>{unit}</span>
@@ -253,7 +232,6 @@ export default function SeenStatsView() {
               label="공스피 누적 소개 연극"
               value={stat.dashboard.total}
               accent={GOLD}
-              icon="🎭"
               sub={
                 <>
                   이번 달 <b style={{ color: "#1c1f24" }}>{dashD.cur}편</b> · <DeltaChip delta={dashD.delta} />
@@ -264,7 +242,6 @@ export default function SeenStatsView() {
               label="극캐 AI 추천 누적 공연"
               value={stat.quiz.total}
               accent={BLUE}
-              icon="🤖"
               sub={
                 <>
                   이번 달 <b style={{ color: "#1c1f24" }}>{quizD.cur}편</b> · <DeltaChip delta={quizD.delta} />
@@ -275,7 +252,6 @@ export default function SeenStatsView() {
               label="집계 기간 · 월 평균"
               value={periodMonths}
               accent="#7b61ff"
-              icon="📈"
               unit="개월"
               sub={
                 <>
