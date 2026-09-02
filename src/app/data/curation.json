@@ -36,37 +36,38 @@
     ]
   },
   "ai": {
-    "hashtag": "가을의 숨결",
-    "moodTitle": "시작의 기미",
-    "moodDesc": "입추를 맞아 가을의 서늘함을\n느낄 수 있는 연극 두 편을\n추천합니다.",
-    "vibe": "잔잔 · 감동",
+    "hashtag": "이슬과 감성",
+    "moodTitle": "가을 감성",
+    "moodDesc": "백로 절기에 어울리는\n감성 가득한 작품들로\n초가을을 만끽하세요.",
+    "vibe": "가을 · 감성",
     "tags": [
-      "입추",
       "가을",
-      "서늘함",
+      "초가을",
+      "감성",
+      "백로",
       "연극",
-      "감동"
+      "대학로"
     ],
     "plays": [
       {
-        "title": "공부의 신 [대학로]",
-        "venue": "업스테이지 (UP Stage) (업스테이지 (UP Stage) )",
-        "from": "2026.08.07",
-        "to": "2026.08.30",
-        "runtime": "1시간 10분",
+        "title": "죽은 시인의 사회 [대학로]",
+        "venue": "NOL 씨어터 대학로 (구. 대학로뮤지컬센터) (우리카드홀 )",
+        "from": "2026.07.18",
+        "to": "2026.09.13",
+        "runtime": "1시간 50분",
         "age": "8",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF294927_260630_105831.gif",
-        "quote": "입추의 시작에 맞춰 새로운 시작을."
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF290257_260529_101937.gif",
+        "quote": "백로의 감성과 어우러지는 작품"
       },
       {
-        "title": "서울의 별 [대학로]",
-        "venue": "대학로 스타릿홀 (공연장)",
-        "from": "2026.07.31",
-        "to": "2026.10.18",
-        "runtime": "1시간 40분",
-        "age": "13",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF295991_260713_171114.gif",
-        "quote": "가을 하늘을 닮은 서울의 별처럼."
+        "title": "브로크백 마운틴 [대학로]",
+        "venue": "예스24아트원(구.대학로아트원씨어터) (1관)",
+        "from": "2026.06.23",
+        "to": "2026.09.06",
+        "runtime": "1시간 55분",
+        "age": "17",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF292095_260522_163412.jpg",
+        "quote": "초가을 낭만과 잘 맞는 연극"
       }
     ]
   }
