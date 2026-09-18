@@ -2,7 +2,7 @@
 // 대학로 필터: boxoffice(서울·연극) 예매순위 → 각 공연 상세조회(daehakro=Y)만 추려 재순위.
 // 차트(공스피/요일별): KOPIS 집계는 전국·연극 단위만 제공되므로 연극 전국 기준 실데이터를 사용한다.
 import { fetchKopisJson } from './_kopis.js'
-import { logSeen } from './_kv.js'
+import { logSeen, kvGetJSON, kvSetJSON } from './_kv.js'
 
 const GENRE_PLAY = 'AAAA' // 연극
 const AREA_SEOUL = '11' // 서울
@@ -311,10 +311,23 @@ export async function getPools(stdate, eddate, maxDetail) {
   })
   const list = toArr(json?.boxofs?.boxof).slice(0, maxDetail)
   const details = await mapLimit(list, 5, (b) => fetchDetail(b.mt20id))
+  // throttle 로 null 난 상세만 1회 재시도(성공분은 캐시돼 있어 실패분만 재호출) — 대학로
+  // 분류 누락으로 TOP 이 10 미만이 되던 근본 원인을 줄인다.
+  const missing = []
+  for (let k = 0; k < list.length; k++) if (!details[k]) missing.push(k)
+  if (missing.length) {
+    await new Promise((r) => setTimeout(r, 350))
+    const retried = await mapLimit(missing, 3, (k) => fetchDetail(list[k].mt20id))
+    missing.forEach((k, i) => {
+      if (retried[i]) details[k] = retried[i]
+    })
+  }
+  let detailOk = 0
   const daehakro = []
   const seoulSmall = []
   for (let k = 0; k < list.length; k++) {
     const d = details[k]
+    if (d) detailOk++
     const seat = num(list[k].seatcnt)
     if (d && String(d.daehakro).toUpperCase() === 'Y') {
       daehakro.push(enrich(list[k], d, daehakro.length + 1))
@@ -324,7 +337,7 @@ export async function getPools(stdate, eddate, maxDetail) {
       seoulSmall.push(enrich(list[k], d, seoulSmall.length + 1))
     }
   }
-  return { daehakro, seoulSmall }
+  return { daehakro, seoulSmall, detailOk, detailTotal: list.length }
 }
 
 // 기존 시그니처 유지(추천/AI 큐레이션이 사용) — 대학로 풀만 반환
@@ -368,7 +381,7 @@ export async function buildDashboard() {
   const stdate = addDays(eddate, -6) // 최근 7일 = 이번주
 
   // 1) 서울·연극 주간 풀 → 대학로 풀(top·곧공연) + 서울 소극장 풀(소극장 top)
-  const { daehakro: pool, seoulSmall } = await getPools(fmt(stdate), fmt(eddate), 60)
+  const { daehakro: pool, seoulSmall, detailOk, detailTotal } = await getPools(fmt(stdate), fmt(eddate), 60)
   // 이번주 대학로 연극 TOP10: 이번주 예매순위(pool 순서)대로 1~10위 재부여
   const top = []
   for (const p of pool) {
@@ -453,24 +466,59 @@ export async function buildDashboard() {
     dayOfWeek,
     dayShowings,
     generatedAt: new Date().toISOString(),
+    // 이 빌드가 throttle 로 망가졌는지 판정용(핸들러가 마지막 정상 스냅샷 폴백에 사용, 응답 전 제거).
+    _health: {
+      detailOk,
+      detailTotal,
+      detailOkRatio: detailTotal ? detailOk / detailTotal : 1,
+      topCount: top.length,
+      trendNonZero: trendNonZero.length,
+    },
   }
+}
+
+const SNAP_KEY = 'dash:lastgood'
+const SNAP_TTL_SEC = 24 * 3600
+
+function sendJSON(res, obj, maxAge) {
+  res.statusCode = 200
+  res.setHeader('Content-Type', 'application/json; charset=utf-8')
+  res.setHeader('Cache-Control', `s-maxage=${maxAge}, stale-while-revalidate=3600`)
+  const { _health, ...rest } = obj // 내부 판정 필드는 응답에서 제거
+  res.end(JSON.stringify(rest))
 }
 
 export async function handleDashboard(req, res) {
   try {
     const payload = await buildDashboard()
-    // 공스피에 등장한(소개된) 연극 누적 집계 — top·소극장·곧공연 목록의 중복 없는 mt20id
-    const seenIds = [
-      ...(payload.top || []),
-      ...(payload.smallTop || []),
-      ...(payload.upcoming || []),
-    ].map((p) => p && p.mt20id)
+    const h = payload._health || {}
+    // 완성 빌드 판정: 대학로 TOP 10편 + 주간추이 0 아닌 주 2개(증감% 계산 가능).
+    // detail throttle 로 대학로 분류가 누락되면 topCount < 10 이 된다.
+    const complete = h.topCount >= 10 && h.trendNonZero >= 2
+
+    let out = payload
+    if (complete) {
+      // 정상 빌드를 "마지막 정상 스냅샷"으로 저장 — 콜드 스타트/향후 throttle 폴백용.
+      await kvSetJSON(SNAP_KEY, payload, SNAP_TTL_SEC)
+    } else {
+      // 이번 빌드가 throttle 로 부실하면 마지막 정상 스냅샷으로 대체(더 완전할 때만).
+      const snap = await kvGetJSON(SNAP_KEY)
+      if (snap && (snap.top?.length || 0) > (payload.top?.length || 0)) {
+        out = { ...snap, stale: true }
+      }
+    }
+
+    // 누적 집계는 실제 서빙된 목록 기준
+    const seenIds = [...(out.top || []), ...(out.smallTop || []), ...(out.upcoming || [])].map((p) => p && p.mt20id)
     await logSeen('dash', seenIds)
-    res.statusCode = 200
-    res.setHeader('Content-Type', 'application/json; charset=utf-8')
-    res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=3600')
-    res.end(JSON.stringify(payload))
+    sendJSON(res, out, 600)
   } catch (err) {
+    // 빌드 자체가 실패해도 마지막 정상 스냅샷이 있으면 서빙(빈 화면 대신).
+    const snap = await kvGetJSON(SNAP_KEY)
+    if (snap) {
+      sendJSON(res, { ...snap, stale: true }, 120)
+      return
+    }
     res.statusCode = 502
     res.setHeader('Content-Type', 'application/json; charset=utf-8')
     res.end(JSON.stringify({ error: String(err?.message || err) }))

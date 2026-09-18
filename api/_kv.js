@@ -28,6 +28,28 @@ export async function kvPipeline(commands) {
   return (await r.json()).map((x) => x.result)
 }
 
+// 범용 JSON GET/SET (마지막 정상 대시보드 스냅샷 등). 미설정/실패 시 무해하게 동작.
+export async function kvGetJSON(key) {
+  try {
+    if (!kvConfigured()) return null
+    const [raw] = await kvPipeline([['GET', key]])
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+export async function kvSetJSON(key, value, ttlSec) {
+  try {
+    if (!kvConfigured()) return
+    const cmd = ['SET', key, JSON.stringify(value)]
+    if (ttlSec) cmd.push('EX', String(ttlSec))
+    await kvPipeline([cmd])
+  } catch {
+    /* ignore */
+  }
+}
+
 // KST 기준 이번 달 키 "YYYY-MM"
 export function kstMonth() {
   const k = new Date(Date.now() + 9 * 3600 * 1000)
