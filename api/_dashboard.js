@@ -206,10 +206,18 @@ function showingsOnDate(pool, dayMs, wd) {
 }
 
 // ----- 상세조회 → 통합 아이템 -----
+// 공연 상세는 자주 안 바뀌므로 메모리 캐시(웜 인스턴스 재사용) → KOPIS 상세조회 폭주/throttle 완화.
+// 실패(throttle)한 건은 캐시하지 않아 다음 빌드에서 다시 시도한다.
+const _detailCache = new Map() // mt20id -> { d, ts }
+const DETAIL_TTL_MS = 12 * 3600 * 1000
 async function fetchDetail(mt20id) {
+  const c = _detailCache.get(mt20id)
+  if (c && Date.now() - c.ts < DETAIL_TTL_MS) return c.d
   const json = await fetchKopisJson(`pblprfr/${mt20id}`)
   const db = json?.dbs?.db
-  return Array.isArray(db) ? db[0] : db
+  const d = Array.isArray(db) ? db[0] : db
+  if (d) _detailCache.set(mt20id, { d, ts: Date.now() })
+  return d
 }
 
 // 공연시설 상세 → 좌표(위/경도) + 주소
@@ -291,7 +299,9 @@ async function mapLimit(items, limit, fn) {
 
 // ----- 대학로 연극 풀 (boxoffice 서울·연극 → daehakro=Y) -----
 // 예매순위와 "곧 시작할 회차" 둘 다 이 풀에서 파생 (KOPIS 호출 절약)
-export async function getDaehakroPool(stdate, eddate, maxDetail) {
+// 서울·연극 주간 예매순위 → (1) 대학로 풀, (2) 서울 소극장(1~300석) 풀 을 한 번의 fetch로 만든다.
+// 동시성은 5로 낮춰 KOPIS 상세조회 throttle 을 줄인다(+상세는 메모리 캐시).
+export async function getPools(stdate, eddate, maxDetail) {
   const json = await fetchKopisJson('boxoffice', {
     ststype: 'week',
     stdate,
@@ -300,15 +310,26 @@ export async function getDaehakroPool(stdate, eddate, maxDetail) {
     area: AREA_SEOUL,
   })
   const list = toArr(json?.boxofs?.boxof).slice(0, maxDetail)
-  const details = await mapLimit(list, 8, (b) => fetchDetail(b.mt20id))
-  const pool = []
+  const details = await mapLimit(list, 5, (b) => fetchDetail(b.mt20id))
+  const daehakro = []
+  const seoulSmall = []
   for (let k = 0; k < list.length; k++) {
     const d = details[k]
+    const seat = num(list[k].seatcnt)
     if (d && String(d.daehakro).toUpperCase() === 'Y') {
-      pool.push(enrich(list[k], d, pool.length + 1))
+      daehakro.push(enrich(list[k], d, daehakro.length + 1))
+    }
+    // 소극장 후보: 서울 전체 1~300석 연극(대학로 포함). 대학로 TOP 중복은 buildDashboard에서 제외.
+    if (seat >= 1 && seat <= 300) {
+      seoulSmall.push(enrich(list[k], d, seoulSmall.length + 1))
     }
   }
-  return pool
+  return { daehakro, seoulSmall }
+}
+
+// 기존 시그니처 유지(추천/AI 큐레이션이 사용) — 대학로 풀만 반환
+export async function getDaehakroPool(stdate, eddate, maxDetail) {
+  return (await getPools(stdate, eddate, maxDetail)).daehakro
 }
 
 // 곧 시작하는 회차: 풀 각 공연의 "현재 이후 다음 회차"를 구해 빠른 순 정렬 (전체 반환)
@@ -324,11 +345,21 @@ function buildSoonShows(pool) {
 }
 
 // ----- 연극 집계 (전국) -----
+// boxStatsCate 도 detail 과 같은 KOPIS 라 콜드 빌드에서 상세 60건과 함께 호출되면 throttle 로
+// 빈값(0)이 온다. 그러면 상단 증감%가 0%로 표시된다(클라이언트 리포트). 메모리 캐시로 완화하되
+// 0(집계 없음/throttle)은 캐시하지 않아 다음 빌드에서 다시 시도한다.
+const _statsCache = new Map() // `${stdate}_${eddate}` -> { v, ts }
+const STATS_TTL_MS = 30 * 60 * 1000
 async function playSeatsForRange(stdate, eddate) {
+  const key = `${stdate}_${eddate}`
+  const c = _statsCache.get(key)
+  if (c && Date.now() - c.ts < STATS_TTL_MS) return c.v
   const json = await fetchKopisJson('boxStatsCate', { stdate, eddate, catecode: GENRE_PLAY })
   const rows = toArr(json?.['box-statsofs']?.boxStatsof)
   const play = rows.find((r) => r.catenm === '연극') ?? rows[0]
-  return { tot: num(play?.totnmrssm), ntss: num(play?.ntssnmrssm) }
+  const v = { tot: num(play?.totnmrssm), ntss: num(play?.ntssnmrssm) }
+  if (v.tot > 0) _statsCache.set(key, { v, ts: Date.now() })
+  return v
 }
 
 export async function buildDashboard() {
@@ -336,8 +367,8 @@ export async function buildDashboard() {
   const eddate = addDays(today, -1) // 어제까지 (집계 완료 구간)
   const stdate = addDays(eddate, -6) // 최근 7일 = 이번주
 
-  // 1) 대학로 연극 풀 → TOP 10 + 곧 시작할 회차 (한 번의 풀에서 파생)
-  const pool = await getDaehakroPool(fmt(stdate), fmt(eddate), 60)
+  // 1) 서울·연극 주간 풀 → 대학로 풀(top·곧공연) + 서울 소극장 풀(소극장 top)
+  const { daehakro: pool, seoulSmall } = await getPools(fmt(stdate), fmt(eddate), 60)
   // 이번주 대학로 연극 TOP10: 이번주 예매순위(pool 순서)대로 1~10위 재부여
   const top = []
   for (const p of pool) {
@@ -345,15 +376,13 @@ export async function buildDashboard() {
     if (top.length >= 10) break
   }
 
-  // 이번주 소극장 연극 TOP5: 연극 + 1~300석 + 이번주 예매순위(pool 순서)
-  // 일반(이번주 대학로) 연극순위(top)와 중복되는 작품은 제외.
+  // 이번주 소극장 연극 TOP5: 서울 전체 1~300석 연극(주간 예매순)에서
+  // 일반(이번주 대학로) 연극순위(top)와 중복되는 작품만 제외하고 5편.
   const topIds = new Set(top.map((t) => t.mt20id))
   const smallTop = []
-  for (const p of pool) {
+  for (const p of seoulSmall) {
     if (topIds.has(p.mt20id)) continue // 일반 연극순위와 중복 제외
-    if (!(p.seatScale >= 1 && p.seatScale <= 300)) continue // 1~300석 (좌석 정보 없으면 제외)
-    if (p.genre && p.genre !== '연극') continue // 연극만 (뮤지컬 등 제외)
-    smallTop.push({ ...p, rank: smallTop.length + 1 }) // 이번주 예매순 → 1위부터 재부여
+    smallTop.push({ ...p, rank: smallTop.length + 1 })
     if (smallTop.length >= 5) break
   }
 
@@ -365,7 +394,7 @@ export async function buildDashboard() {
   // 2) 요일별 예매 — 항상 연속 7일(막대 7개) 유지. 단 마지막 날(어제)이 집계 미완이면
   //    하루 당겨 "그제까지의 7일"을 사용한다. (판정 위해 앞에 하루 더 받아 8일치 확보)
   const days8 = Array.from({ length: 8 }, (_, k) => addDays(stdate, k - 1)) // (stdate-1) ~ eddate
-  const dayStats8 = await mapLimit(days8, 8, (d) => playSeatsForRange(fmt(d), fmt(d)))
+  const dayStats8 = await mapLimit(days8, 4, (d) => playSeatsForRange(fmt(d), fmt(d)))
   const rows8 = days8.map((d, k) => ({
     day: WEEKDAYS_EN[d.getDay()],
     dayKo: WEEKDAYS_KO[d.getDay()],
@@ -389,7 +418,7 @@ export async function buildDashboard() {
     const we = addDays(ws, 6)
     return { ws, we }
   })
-  const weekStats = await mapLimit(weekWindows, 8, (w) => playSeatsForRange(fmt(w.ws), fmt(w.we)))
+  const weekStats = await mapLimit(weekWindows, 4, (w) => playSeatsForRange(fmt(w.ws), fmt(w.we)))
   const weeklyTrend = weekWindows.map((w, k) => ({
     label: weekLabel(w.ws),
     seats: weekStats[k]?.tot ?? 0,
@@ -400,8 +429,11 @@ export async function buildDashboard() {
   // 미완 날을 이미 뺐으므로 가장 최근(완성) 날을 "오늘의 공스피"로 사용
   const daysWithData = dayOfWeek.filter((d) => d.seats > 0)
   const todaySeats = (daysWithData[daysWithData.length - 1] ?? dayOfWeek[dayOfWeek.length - 1])?.seats ?? 0
-  const thisWeekTot = weeklyTrend[weeklyTrend.length - 1]?.seats ?? weekTotalSeats
-  const lastWeekTot = weeklyTrend[weeklyTrend.length - 2]?.seats ?? 0
+  // 증감%는 "가장 최근의 0 아닌 두 주"로 계산한다. 한 주라도 boxStatsCate throttle 로 0이 오면
+  // 예전 로직은 분모가 0 → 0%로 눌렸다(클라이언트 리포트). 0 주는 건너뛰어 실제 증감을 유지.
+  const trendNonZero = weeklyTrend.filter((w) => w.seats > 0)
+  const thisWeekTot = trendNonZero[trendNonZero.length - 1]?.seats ?? weekTotalSeats
+  const lastWeekTot = trendNonZero[trendNonZero.length - 2]?.seats ?? 0
   const weekDeltaPct = lastWeekTot > 0 ? ((thisWeekTot - lastWeekTot) / lastWeekTot) * 100 : 0
 
   return {
