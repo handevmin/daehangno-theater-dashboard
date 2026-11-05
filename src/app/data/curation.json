@@ -34,37 +34,37 @@
     ]
   },
   "ai": {
-    "hashtag": "가을의 공포",
-    "moodTitle": "할로윈의 밤",
-    "moodDesc": "할로윈을 맞아\n공포와 유쾌함을\n느낄 수 있는 공연을\n추천합니다.",
-    "vibe": "공포 · 유쾌",
+    "hashtag": "초겨울의 따뜻함",
+    "moodTitle": "따뜻한 시작",
+    "moodDesc": "입동을 맞아 따뜻한\n연극으로 겨울을 준비해요.",
+    "vibe": "따뜻함 · 감동",
     "tags": [
-      "할로윈",
-      "공포",
-      "유쾌",
-      "가을",
-      "축제"
+      "입동",
+      "겨울",
+      "따뜻함",
+      "연극",
+      "대학로"
     ],
     "plays": [
       {
-        "title": "제1회 스텝UP 페스티벌 [대학로]",
-        "venue": "미래아트홀 (미래아트홀)",
-        "from": "2026.10.14",
-        "to": "2026.11.22",
-        "runtime": "1시간 30분",
-        "age": "14",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF301685_260923_133510.jpg",
-        "quote": "할로윈의 유쾌함을 느낄 수 있는 연극"
+        "title": "라 파운데이션 [대학로]",
+        "venue": "업스테이지 (UP Stage) (업스테이지 (UP Stage) )",
+        "from": "2026.11.06",
+        "to": "2026.11.29",
+        "runtime": "2시간",
+        "age": "15",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF303353_261014_162607.jpg",
+        "quote": "입동을 맞이하며 따뜻한 감동을 전합니다."
       },
       {
-        "title": "스타크로스드 [대학로]",
-        "venue": "예스24아트원(구.대학로아트원씨어터) (2관)",
-        "from": "2026.09.22",
-        "to": "2026.12.13",
-        "runtime": "1시간 50분",
-        "age": "17",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF298289_260812_103259.jpg",
-        "quote": "가을 상강에 어울리는 짙은 감정의 연극"
+        "title": "보잉보잉",
+        "venue": "대학로 스타릿홀 (공연장)",
+        "from": "2026.10.24",
+        "to": "2026.11.22",
+        "runtime": "1시간 40분",
+        "age": "13",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF301715_260928_101842.gif",
+        "quote": "겨울 시작, 가벼운 마음으로 웃어보세요."
       }
     ]
   }
