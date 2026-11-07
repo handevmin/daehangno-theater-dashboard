@@ -34,37 +34,37 @@
     ]
   },
   "ai": {
-    "hashtag": "초겨울의 따뜻함",
-    "moodTitle": "따뜻한 시작",
-    "moodDesc": "입동을 맞아 따뜻한\n연극으로 겨울을 준비해요.",
-    "vibe": "따뜻함 · 감동",
+    "hashtag": "겨울의 시작",
+    "moodTitle": "입동의 하루",
+    "moodDesc": "입동, 겨울이 시작되며\n따뜻한 마음과 함께\n연극을 즐기세요.",
+    "vibe": "겨울 · 감성",
     "tags": [
       "입동",
       "겨울",
-      "따뜻함",
       "연극",
+      "문화",
       "대학로"
     ],
     "plays": [
       {
-        "title": "라 파운데이션 [대학로]",
-        "venue": "업스테이지 (UP Stage) (업스테이지 (UP Stage) )",
-        "from": "2026.11.06",
-        "to": "2026.11.29",
-        "runtime": "2시간",
-        "age": "15",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF303353_261014_162607.jpg",
-        "quote": "입동을 맞이하며 따뜻한 감동을 전합니다."
+        "title": "내게 빛나는 모든 것 [대학로]",
+        "venue": "홍익대 대학로 아트센터 (소극장)",
+        "from": "2026.10.17",
+        "to": "2026.11.08",
+        "runtime": "1시간 30분",
+        "age": "14",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF301256_260918_104819.jpg",
+        "quote": "입동에 어울리는 따뜻한 이야기"
       },
       {
-        "title": "보잉보잉",
-        "venue": "대학로 스타릿홀 (공연장)",
-        "from": "2026.10.24",
-        "to": "2026.11.22",
+        "title": "스틸히어로 [대학로]",
+        "venue": "봄날아트홀 (구. 아리랑소극장) (2관 (지하2층) )",
+        "from": "2026.11.06",
+        "to": "2026.11.15",
         "runtime": "1시간 40분",
-        "age": "13",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF301715_260928_101842.gif",
-        "quote": "겨울 시작, 가벼운 마음으로 웃어보세요."
+        "age": "전체",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF304463_261026_141504.jpg",
+        "quote": "겨울의 시작에 맞는 히어로 이야기"
       }
     ]
   }
