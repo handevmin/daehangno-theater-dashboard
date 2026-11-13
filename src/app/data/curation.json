@@ -34,18 +34,28 @@
     ]
   },
   "ai": {
-    "hashtag": "초겨울의 따뜻함",
-    "moodTitle": "따뜻한 시작",
-    "moodDesc": "입동을 맞아 따뜻한\n연극으로 겨울을 준비해요.",
-    "vibe": "따뜻함 · 감동",
+    "hashtag": "문화의 날",
+    "moodTitle": "가을의 무대",
+    "moodDesc": "무비데이와 어울리는\n공연으로 가을을\n느껴보세요.",
+    "vibe": "문화 · 감성",
     "tags": [
-      "입동",
-      "겨울",
-      "따뜻함",
-      "연극",
+      "무비데이",
+      "공연",
+      "문화",
+      "가을",
       "대학로"
     ],
     "plays": [
+      {
+        "title": "더 라스트 카고",
+        "venue": "드림시어터 [대학로] (소극장)",
+        "from": "2026.11.06",
+        "to": "2026.12.13",
+        "runtime": "1시간 20분",
+        "age": "15",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF302012_260929_150833.jpg",
+        "quote": "무비데이에 어울리는 연극의 감동"
+      },
       {
         "title": "라 파운데이션 [대학로]",
         "venue": "업스테이지 (UP Stage) (업스테이지 (UP Stage) )",
@@ -54,17 +64,7 @@
         "runtime": "2시간",
         "age": "15",
         "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF303353_261014_162607.jpg",
-        "quote": "입동을 맞이하며 따뜻한 감동을 전합니다."
-      },
-      {
-        "title": "보잉보잉",
-        "venue": "대학로 스타릿홀 (공연장)",
-        "from": "2026.10.24",
-        "to": "2026.11.22",
-        "runtime": "1시간 40분",
-        "age": "13",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF301715_260928_101842.gif",
-        "quote": "겨울 시작, 가벼운 마음으로 웃어보세요."
+        "quote": "문화의 날에 즐기는 특별한 무대"
       }
     ]
   }
