@@ -35,36 +35,36 @@
   },
   "ai": {
     "hashtag": "문화의 날",
-    "moodTitle": "가을의 무대",
-    "moodDesc": "무비데이와 어울리는\n공연으로 가을을\n느껴보세요.",
+    "moodTitle": "문화의 향유",
+    "moodDesc": "첫 눈이 내린다는 절기 '소설' 를 맞아\n초겨울의 정취를 느껴보세요.",
     "vibe": "문화 · 감성",
     "tags": [
       "무비데이",
+      "소설",
       "공연",
-      "문화",
-      "가을",
-      "대학로"
+      "초겨울",
+      "문화"
     ],
     "plays": [
       {
-        "title": "더 라스트 카고",
-        "venue": "드림시어터 [대학로] (소극장)",
-        "from": "2026.11.06",
-        "to": "2026.12.13",
-        "runtime": "1시간 20분",
-        "age": "15",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF302012_260929_150833.jpg",
-        "quote": "무비데이에 어울리는 연극의 감동"
-      },
-      {
-        "title": "라 파운데이션 [대학로]",
-        "venue": "업스테이지 (UP Stage) (업스테이지 (UP Stage) )",
-        "from": "2026.11.06",
+        "title": "꽃의 비밀 [대학로]",
+        "venue": "링크아트센터 (벅스홀)",
+        "from": "2026.09.12",
         "to": "2026.11.29",
         "runtime": "2시간",
-        "age": "15",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF303353_261014_162607.jpg",
-        "quote": "문화의 날에 즐기는 특별한 무대"
+        "age": "14",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF297978_260807_141003.gif",
+        "quote": "무비데이와 어울리는 따뜻한 이야기"
+      },
+      {
+        "title": "올모스트 메인 [대학로]",
+        "venue": "소극장 공유 (소극장 공유)",
+        "from": "2026.11.12",
+        "to": "2026.11.22",
+        "runtime": "1시간 35분",
+        "age": "13",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF304750_261028_153659.gif",
+        "quote": "소설 절기에 맞는 감성적인 무대"
       }
     ]
   }
