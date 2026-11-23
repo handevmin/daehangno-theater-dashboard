@@ -34,37 +34,37 @@
     ]
   },
   "ai": {
-    "hashtag": "문화의 날",
-    "moodTitle": "문화의 향유",
-    "moodDesc": "첫 눈이 내린다는 절기 '소설' 를 맞아\n초겨울의 정취를 느껴보세요.",
-    "vibe": "문화 · 감성",
+    "hashtag": "수험생의 쉼",
+    "moodTitle": "휴식의 순간",
+    "moodDesc": "수능 후 긴장 푸는\n소설의 첫눈 같은 순간\n연극으로 만끽하세요.",
+    "vibe": "휴식 · 감성",
     "tags": [
-      "무비데이",
+      "수능",
       "소설",
-      "공연",
-      "초겨울",
-      "문화"
+      "휴식",
+      "감성",
+      "연극"
     ],
     "plays": [
       {
-        "title": "꽃의 비밀 [대학로]",
-        "venue": "링크아트센터 (벅스홀)",
-        "from": "2026.09.12",
-        "to": "2026.11.29",
-        "runtime": "2시간",
-        "age": "14",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF297978_260807_141003.gif",
-        "quote": "무비데이와 어울리는 따뜻한 이야기"
+        "title": "포쉬 [대학로]",
+        "venue": "굿씨어터 (굿씨어터)",
+        "from": "2026.11.03",
+        "to": "2027.01.24",
+        "runtime": "1시간 50분",
+        "age": "17",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF302924_261012_131605.jpg",
+        "quote": "수능 후 긴장 풀기에 적합한 연극"
       },
       {
-        "title": "올모스트 메인 [대학로]",
-        "venue": "소극장 공유 (소극장 공유)",
-        "from": "2026.11.12",
-        "to": "2026.11.22",
-        "runtime": "1시간 35분",
-        "age": "13",
-        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF304750_261028_153659.gif",
-        "quote": "소설 절기에 맞는 감성적인 무대"
+        "title": "설강화 [대학로]",
+        "venue": "큐씨어터(구. 수상한흥신소전용관) (큐씨어터(구. 수상한흥신소전용관))",
+        "from": "2026.11.20",
+        "to": "2027.01.03",
+        "runtime": "1시간 40분",
+        "age": "17",
+        "poster": "http://www.kopis.or.kr/upload/pfmPoster/PF_PF304882_261030_104339.jpg",
+        "quote": "소설 절기의 감성적 분위기 연극"
       }
     ]
   }
